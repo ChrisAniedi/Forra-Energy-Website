@@ -2,9 +2,9 @@
 
 import SolutionPage, { type SolutionData } from "@/components/solutions/SolutionPage";
 import {
-  AcIc, BatteryIc, BuildingIc, BulbIc, ChartIc, CpuIc, FactoryIc, FanIc, FridgeIc, GaugeIc,
-  HealthIc, HotelIc, LaptopIc, LeafIc, MonitorIc, PumpIc, SchoolIc, SettingIc, ShieldIc,
-  ShopIc, StarIc, TvIc, WalletIc,
+  AcIc, BankIc, BatteryIc, BuildingIc, BulbIc, ChartIc, ChurchIc, CpuIc, EstateIc, FactoryIc,
+  FanIc, FridgeIc, GaugeIc, HealthIc, HotelIc, LaptopIc, LeafIc, MonitorIc, PeopleIc, PumpIc,
+  SchoolIc, SettingIc, ShieldIc, ShopIc, StarIc, TractorIc, TvIc, WalletIc,
 } from "@/components/ui/icons";
 
 const SME_DATA: SolutionData = {
@@ -295,9 +295,205 @@ const MANUFACTURING_DATA: SolutionData = {
   ctaText: "Talk to our industrial team, or start with an audit to model your plant's system, savings and financing.",
 };
 
+const AGRICULTURE_DATA: SolutionData = {
+  eyebrow: "For farms & agribusiness",
+  h1: "Power the farm, protect the harvest",
+  intro:
+    "Irrigation, cold storage and processing all run on power — and diesel makes every one of them cost more, when the grid reaches your land at all. Forra brings reliable, off-grid-ready solar to farms and agribusiness, cutting fuel costs and protecting what you grow.",
+  points: ["Run pumps & irrigation", "Protect cold storage", "Off-grid ready", "Cut diesel on the farm"],
+  powersTitle: "On the farm",
+  powers: [[PumpIc, "Irrigation pumps"], [FridgeIc, "Cold storage"], [FanIc, "Poultry & ventilation"], [SettingIc, "Processing equipment"], [BulbIc, "Farmstead lighting"]],
+  coverage: 93,
+  stats: [
+    { to: 50, suffix: "%+", l: "Diesel cost cut" },
+    { to: 100, suffix: "%", l: "Off-grid capable" },
+    { to: 12, suffix: "+", l: "States served" },
+    { to: 25, suffix: "-yr", l: "Panel warranty" },
+  ],
+  benefitsEyebrow: "Why farms switch",
+  benefitsTitle: "Grow more, spend less on fuel.",
+  benefits: [
+    [PumpIc, "Irrigation without diesel", "Solar runs your pumps through the sunniest hours, so watering your crops no longer means burning fuel by the drum."],
+    [FridgeIc, "Protect your produce", "Reliable power holds cold rooms and storage steady, guarding harvests, dairy and poultry from spoilage and loss."],
+    [TractorIc, "Power anywhere", "Off-grid solar and storage bring dependable power to remote land the grid has never reached."],
+    [SettingIc, "Run your processing", "Mills, dryers, feed lines and other equipment keep working on clean power instead of costly, unreliable diesel."],
+    [ShieldIc, "Built for the field", "Rugged, well-engineered systems designed to keep running through the demands of a working farm."],
+    [MonitorIc, "See your usage", "Track generation and consumption in the Forra app, so you know exactly what powering the farm costs."],
+  ],
+  challengesEyebrow: "On the land",
+  challengesTitle: "Farm problems, solved by the sun.",
+  challenges: [
+    ["Diesel for irrigation is killing our margins", "Solar runs your pumps through the sunniest hours for free, and storage keeps water flowing when you need it — slashing fuel cost per hectare."],
+    ["We lose produce when the power fails", "Reliable power holds cold rooms and storage steady, protecting harvests, dairy and poultry from spoilage."],
+    ["The grid doesn't reach our land", "Off-grid solar and storage bring dependable power to remote farms with no grid connection at all."],
+  ],
+  stepsEyebrow: "How it works",
+  stepsTitle: "From the field to fully powered.",
+  steps: [
+    ["Farm energy audit", "We assess your pumps, cold storage and processing loads to size a system for both daytime work and overnight needs."],
+    ["Off-grid-ready design", "Engineers design solar and storage — grid-tied or fully off-grid — matched to your land and seasonal demand."],
+    ["Rugged installation", "Installed to withstand farm conditions, safety-tested and handed over with everything explained."],
+    ["Monitor & support", "Your system goes live in the app, backed by warranties and support that reaches rural sites."],
+  ],
+  quote: {
+    text: "Our borehole and cold room used to run on diesel around the clock. Forra put us on solar — the pumps run for free by day and the produce is safe. Our fuel bill has all but vanished.",
+    name: "Musa Aliyu", role: "Farm Owner · Kaduna", init: "MA",
+  },
+  ctaTitle: "Power the farm, protect the yield.",
+  ctaText: "Start with a free audit — we'll size a system for your pumps, storage and processing, off-grid if you need it.",
+};
+
+const GOVERNMENT_DATA: SolutionData = {
+  eyebrow: "For government & public sector",
+  h1: "Dependable power for public service",
+  intro:
+    "Public offices, health centres, water schemes and street lighting all depend on power that too often fails — while diesel drains recurrent budgets. Forra delivers reliable, monitored solar for the public sector, with financing and PPA models built for procurement.",
+  points: ["Reliable public services", "Cut recurrent diesel spend", "Transparent & monitored", "Financing & PPA models"],
+  powersTitle: "Public infrastructure",
+  powers: [[BuildingIc, "Public offices"], [HealthIc, "Primary health centres"], [PumpIc, "Water schemes"], [BulbIc, "Street & security lighting"], [MonitorIc, "Security & CCTV"]],
+  coverage: 96,
+  stats: [
+    { to: 45, suffix: "%+", l: "Recurrent cost cut" },
+    { to: 12, suffix: "+", l: "States served" },
+    { to: 99, suffix: "%", l: "Uptime target" },
+    { to: 1900, suffix: " t", l: "CO₂ offset" },
+  ],
+  benefitsEyebrow: "Why the public sector chooses Forra",
+  benefitsTitle: "Better services, lower recurrent cost.",
+  benefits: [
+    [BuildingIc, "Continuity of services", "Reliable power keeps offices, health centres and water schemes serving citizens without interruption."],
+    [WalletIc, "Value for taxpayers", "Solar sharply cuts fuel and maintenance line items, freeing recurrent budget for the services that matter."],
+    [ChartIc, "Transparency & accountability", "Monitored systems give clear generation and savings data for audits, budgets and public reporting."],
+    [HealthIc, "Reach every community", "Off-grid solar brings dependable power to rural clinics, schools and water points the grid can't serve."],
+    [ShieldIc, "Resilience for agencies", "Prioritised backup keeps critical public agencies and safety systems running through any outage."],
+    [LeafIc, "Meet climate targets", "Verifiable clean-energy generation supports national and state sustainability commitments."],
+  ],
+  challengesEyebrow: "The public-sector reality",
+  challengesTitle: "Serving citizens, sustainably.",
+  challenges: [
+    ["Recurrent diesel costs strain budgets", "Solar sharply cuts fuel and maintenance line items, freeing recurrent budget — with financing or PPA models that fit public procurement."],
+    ["Public services stall during outages", "Reliable power keeps offices, health centres and water schemes serving citizens without interruption."],
+    ["We're accountable for every naira", "Transparent, monitored systems give clear generation and savings data for audits, budgets and public reporting."],
+  ],
+  stepsEyebrow: "How it works",
+  stepsTitle: "From proposal to public benefit.",
+  steps: [
+    ["Needs assessment", "We audit the facilities and loads in scope — offices, clinics, water, lighting — and model system size and savings."],
+    ["Procurement-ready design", "Detailed engineering and costing prepared to fit public procurement, financing or PPA structures."],
+    ["Managed rollout", "Installation and commissioning across sites with full compliance, safety testing and clear documentation."],
+    ["Monitor & report", "Ongoing monitoring and reporting give agencies the data to track performance, savings and impact."],
+  ],
+  quote: {
+    text: "Forra electrified a cluster of our primary health centres with solar. They now run day and night without diesel, and we have clear data on every naira saved — exactly what we're accountable for.",
+    name: "Hon. Grace Eze", role: "State Health Commissioner", init: "GE",
+  },
+  ctaTitle: "Reliable power, accountable spending.",
+  ctaText: "Talk to our public-sector team, or start with an audit to scope facilities, savings and a procurement-ready plan.",
+};
+
+const REALESTATE_DATA: SolutionData = {
+  eyebrow: "For estates & developments",
+  h1: "Power that lifts every property's value",
+  intro:
+    "Estates, gated communities and developments live and die on reliable common services — and diesel drives service charges up while pushing buyers away. Forra delivers estate-wide solar that lowers charges, powers amenities seamlessly and makes every unit more attractive.",
+  points: ["Estate-wide reliable power", "Lower service charges", "A standout selling point", "Financed at scale"],
+  powersTitle: "Across the estate",
+  powers: [[EstateIc, "Homes & units"], [BulbIc, "Street & common lighting"], [PumpIc, "Water & boreholes"], [MonitorIc, "Gatehouse & CCTV"], [BuildingIc, "Clubhouse & amenities"]],
+  coverage: 96,
+  stats: [
+    { to: 40, suffix: "%+", l: "Service-charge cut" },
+    { to: 12, suffix: "+", l: "States served" },
+    { to: 97, suffix: "%", l: "Systems online" },
+    { to: 1, suffix: "-day", l: "Per-unit install" },
+  ],
+  benefitsEyebrow: "Why developers choose Forra",
+  benefitsTitle: "Reliable power is a selling point.",
+  benefits: [
+    [EstateIc, "Sell & let faster", "A solar-powered estate with seamless common-area backup is a genuine draw that moves units faster and at better value."],
+    [WalletIc, "Lower service charges", "Estate-wide solar cuts the communal fuel bill, reducing service charges and the friction that comes with them."],
+    [BulbIc, "Always-on common areas", "Street lighting, gatehouses, lifts and water pumps stay reliably powered, day and night."],
+    [BatteryIc, "A quieter community", "Silent, clean power replaces communal generators — no roar or fumes across the development."],
+    [BuildingIc, "Scales with your phases", "Modular systems grow with the estate, so each new phase or block is a simple capacity addition."],
+    [MonitorIc, "One view for managers", "Facility managers track generation, usage and savings across the whole development from the Forra app."],
+  ],
+  challengesEyebrow: "The estate reality",
+  challengesTitle: "What moves units — and what stalls them.",
+  challenges: [
+    ["Diesel drives service charges up", "Estate-wide solar and storage cut the communal fuel bill, lowering service charges and making units more attractive to buyers and tenants."],
+    ["Buyers expect reliable power", "A solar-powered estate with seamless common-area backup is a real selling point that moves units faster and at better value."],
+    ["Managing power across many units is complex", "Centralised monitoring gives facility managers one clear view of generation, usage and savings across the whole development."],
+  ],
+  stepsEyebrow: "How it works",
+  stepsTitle: "From master plan to powered community.",
+  steps: [
+    ["Development audit", "We assess common areas, units and amenities to size a system that serves the whole estate reliably."],
+    ["Phased design", "Engineers design solar and storage that fit the development's layout and can scale with each construction phase."],
+    ["Managed installation", "Rolled out across the estate with minimal disruption to residents and full safety compliance."],
+    ["Monitor & manage", "Facility managers get ongoing monitoring, maintenance and clear reporting across the community."],
+  ],
+  quote: {
+    text: "We put Forra solar across the estate's common areas and boreholes. Service charges dropped, the generators fell silent, and 'solar-powered' has become one of our best sales lines.",
+    name: "Chidi Okonkwo", role: "MD, Parkview Estates · Lagos", init: "CO",
+  },
+  ctaTitle: "Build a development that sells itself.",
+  ctaText: "Talk to our real-estate team, or start with an audit to scope estate-wide power, savings and financing.",
+};
+
+const RELIGIOUS_DATA: SolutionData = {
+  eyebrow: "For churches, mosques & worship centres",
+  h1: "Keep the doors open and the service on",
+  intro:
+    "Worship shouldn't stop when the grid does, and a roaring generator shouldn't drown out the service. Forra brings silent, reliable solar to churches, mosques and worship centres — freeing funds from diesel for the mission that matters.",
+  points: ["Services never interrupted", "Silent, distraction-free", "Free up funds from diesel", "Financed comfortably"],
+  powersTitle: "During service",
+  powers: [[ChurchIc, "Auditorium & hall"], [MonitorIc, "PA & media"], [FanIc, "Fans & AC"], [BulbIc, "Lighting"], [FridgeIc, "Kitchen & outreach"]],
+  coverage: 96,
+  stats: [
+    { to: 45, suffix: "%+", l: "Diesel cost cut" },
+    { to: 24, suffix: "/7", l: "Reliable power" },
+    { to: 12, suffix: "+", l: "States served" },
+    { to: 97, suffix: "%", l: "Systems online" },
+  ],
+  benefitsEyebrow: "Why congregations switch",
+  benefitsTitle: "More for the mission, less on fuel.",
+  benefits: [
+    [ChurchIc, "Uninterrupted worship", "Services, sound and lighting carry on seamlessly through any outage — the message is never cut short."],
+    [BatteryIc, "Silence during service", "Solar and battery power replace the generator's roar and fumes, keeping worship calm and distraction-free."],
+    [WalletIc, "Steward funds well", "Cutting the diesel bill frees giving for the community programs and missions your organisation exists for."],
+    [PeopleIc, "Power large gatherings", "Sized storage carries the auditorium, PA, lighting and cooling through long services and big events."],
+    [ShieldIc, "A safe, lit premises", "Steady security lighting keeps the grounds safe for evening services and midweek programs."],
+    [MonitorIc, "Simple oversight", "Trustees and administrators track generation, usage and savings clearly in the Forra app."],
+  ],
+  challengesEyebrow: "In the sanctuary",
+  challengesTitle: "The distractions we remove.",
+  challenges: [
+    ["The generator drowns out the service", "Silent solar and battery power replaces the generator during worship — no roar, no fumes, just an uninterrupted service."],
+    ["Diesel eats into what we could give", "Solar cuts fuel spending sharply, redirecting funds to the community programs and missions your organisation exists for."],
+    ["Big events and services strain our power", "Sized storage carries the auditorium, sound system, lighting and cooling through long services and large gatherings."],
+  ],
+  stepsEyebrow: "How it works",
+  stepsTitle: "From assessment to uninterrupted worship.",
+  steps: [
+    ["Facility audit", "We assess the auditorium, sound, lighting and cooling to size a system for both regular services and large events."],
+    ["Tailored design", "Engineers design solar and storage to carry your service loads silently and reliably, with room for growth."],
+    ["Considerate installation", "Installed around your service calendar, tidily and safety-tested, with a clear handover to your team."],
+    ["Monitor & support", "Your system goes live in the app, backed by warranties and support your administrators can rely on."],
+  ],
+  quote: {
+    text: "The generator used to hum right through worship. Now our services run in silence on solar, and the money we saved on diesel has gone straight into our outreach.",
+    name: "Pastor Samuel Ade", role: "Grace Chapel · Ibadan", init: "SA",
+  },
+  ctaTitle: "Let nothing interrupt the service.",
+  ctaText: "Start with a free audit — we'll size a silent system for your services and a plan your organisation can keep.",
+};
+
 export const SmeContent = () => <SolutionPage data={SME_DATA} />;
 export const CommercialContent = () => <SolutionPage data={COMMERCIAL_DATA} />;
 export const HealthcareContent = () => <SolutionPage data={HEALTHCARE_DATA} />;
 export const EducationContent = () => <SolutionPage data={EDUCATION_DATA} />;
 export const HospitalityContent = () => <SolutionPage data={HOSPITALITY_DATA} />;
 export const ManufacturingContent = () => <SolutionPage data={MANUFACTURING_DATA} />;
+export const AgricultureContent = () => <SolutionPage data={AGRICULTURE_DATA} />;
+export const GovernmentContent = () => <SolutionPage data={GOVERNMENT_DATA} />;
+export const RealEstateContent = () => <SolutionPage data={REALESTATE_DATA} />;
+export const ReligiousContent = () => <SolutionPage data={RELIGIOUS_DATA} />;

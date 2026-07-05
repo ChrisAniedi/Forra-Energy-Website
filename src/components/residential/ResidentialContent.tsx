@@ -1,8 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { PACKAGES, monthlyFrom } from "@/components/shop/packages";
-import { ArrowR, BatteryIc, ChartIc, LeafIc, MonitorIc, ShieldIc, SunIc, TickIc, WalletIc, type IconType } from "@/components/ui/icons";
+import { AcIc, ArrowR, BatteryIc, BulbIc, ChartIc, FridgeIc, LeafIc, MonitorIc, PumpIc, ShieldIc, SunIc, TickIc, TvIc, WalletIc, type IconType } from "@/components/ui/icons";
 import { Btn } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { CountUp } from "@/components/ui/CountUp";
@@ -27,26 +28,61 @@ const STEPS = [
 
 const HOME_PICKS = ["lite-25", "core-5", "core-5p"];
 
+const POWERS: [IconType, string][] = [
+  [FridgeIc, "Fridge & freezer"], [AcIc, "AC & fans"], [BulbIc, "Lights"], [TvIc, "TV & Wi-Fi"], [PumpIc, "Water pump"],
+];
+const CHALLENGES: [string, string][] = [
+  ["Outages ruin our evenings", "A hybrid battery bank switches over the instant the grid drops — lights, fans and the TV never even flicker."],
+  ["The generator is loud, costly and constant", "Solar and storage do the generator's job silently and for a fraction of the running cost — most homes stop buying diesel within the first year."],
+  ["We don't know what we spend on power", "The Forra app shows live generation, battery level and usage, so you always know exactly what your energy costs."],
+];
+
 const ResidentialContent = () => {
   const { openExpert } = useOverlay();
   const picks = HOME_PICKS.map((id) => PACKAGES.find((p) => p.id === id)!).filter(Boolean);
+  const [ch, setCh] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setCh((c) => (c + 1) % CHALLENGES.length), 4200);
+    return () => clearInterval(t);
+  }, []);
 
   return (
     <main className="page">
       <section className="page-hero">
-        <div className="container page-hero-inner">
-          <Eyebrow>Residential solar</Eyebrow>
-          <h1>Reliable power for every room<span className="gold">.</span></h1>
-          <p>Keep the lights, fans, fridge and AC running through every outage — quietly, cleanly and for less than you spend on diesel today. Designed, installed and monitored by Forra.</p>
-          <ul className="pr-points">
-            {["Single-day installation", "Financing available", "10-year battery warranty", "Live app monitoring"].map((t) => (
-              <li key={t}><TickIc size={15} color="#0A7A50" />{t}</li>
-            ))}
-          </ul>
-          <div className="hero-actions res-hero-actions">
-            <Link href="/audit" className="btn btn--primary"><span>Size my home system</span><ArrowR size={17} /></Link>
-            <Link href="/shop" className="btn btn--outline"><span>Browse home systems</span></Link>
+        <div className="container sol-hero">
+          <div className="sol-hero-copy">
+            <Eyebrow>Residential solar</Eyebrow>
+            <h1>Reliable power for every room<span className="gold">.</span></h1>
+            <p>Keep the lights, fans, fridge and AC running through every outage — quietly, cleanly and for less than you spend on diesel today. Designed, installed and monitored by Forra.</p>
+            <ul className="pr-points">
+              {["Single-day installation", "Financing available", "10-year battery warranty", "Live app monitoring"].map((t) => (
+                <li key={t}><TickIc size={15} color="#0A7A50" />{t}</li>
+              ))}
+            </ul>
+            <div className="hero-actions res-hero-actions">
+              <Link href="/audit" className="btn btn--primary"><span>Size my home system</span><ArrowR size={17} /></Link>
+              <Link href="/shop" className="btn btn--outline"><span>Browse home systems</span></Link>
+            </div>
           </div>
+          <aside className="sol-panel">
+            <div className="sol-panel-bar">
+              <span className="sol-live"><span className="live-dot" />What stays on</span>
+              <span className="sol-panel-tag">On solar</span>
+            </div>
+            <ul className="sol-loads">
+              {POWERS.map(([Ic, l], i) => (
+                <li key={l} style={{ ["--d" as string]: `${i * 0.25}s` }}>
+                  <span className="sol-load-ic"><Ic size={17} color="#0A7A50" /></span>
+                  <span className="sol-load-name">{l}</span>
+                  <span className="sol-load-dot" />
+                </li>
+              ))}
+            </ul>
+            <div className="sol-cov">
+              <div className="sol-cov-top"><label>Load on clean power</label><strong>95%</strong></div>
+              <div className="sol-cov-bar"><span style={{ ["--w" as string]: "95%" }} /></div>
+            </div>
+          </aside>
         </div>
       </section>
 
@@ -78,6 +114,28 @@ const ResidentialContent = () => {
                 <h3>{t}</h3><p>{d}</p>
               </article>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* interactive challenge switcher */}
+      <section className="section">
+        <div className="container split split--top">
+          <div>
+            <Eyebrow>Sound familiar?</Eyebrow>
+            <h2>Home power, sorted.</h2>
+            <ol className="sol-ch-list">
+              {CHALLENGES.map(([q], i) => (
+                <li key={q} className={i === ch ? "on" : ""} onClick={() => setCh(i)}>
+                  <span className="sol-ch-num">{String(i + 1).padStart(2, "0")}</span>
+                  <span>{q}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+          <div className="sol-ch-panel">
+            <span className="sol-ch-tag"><TickIc size={14} color="#5FD6A0" />The Forra approach</span>
+            <p key={ch}>{CHALLENGES[ch][1]}</p>
           </div>
         </div>
       </section>
