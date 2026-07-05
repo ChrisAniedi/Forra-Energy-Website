@@ -6,7 +6,7 @@ import { useEscapeKey, useScrollLock } from "@/lib/hooks";
 import { useState } from "react";
 import { ArrowR, BuildingIc, FlashIc, GaugeIc, HomeIc, MailIc, PhoneIc, TickIc, WaIc, WalletIc, type IconType } from "@/components/ui/icons";
 import { Btn } from "@/components/ui/Button";
-import { useOverlay } from "@/context/OverlayProvider";
+import { useOverlay, type OverlayPrefill } from "@/context/OverlayProvider";
 
 const GOALS = [
   [HomeIc, "Power my home", "Duplex, flat or estate residence"],
@@ -19,7 +19,7 @@ const PROPS = ["Flat / apartment", "Duplex / bungalow", "Office", "Shop / store"
 const SPENDS = ["Under ₦50k", "₦50k – ₦150k", "₦150k – ₦500k", "Over ₦500k"];
 const GENS = ["No generator", "Occasional use", "Daily use"];
 const BACKUPS = ["4–6 hours", "8–12 hours", "24/7 power"];
-const GetStartedWizard = ({ onClose }: { onClose: () => void }) => {
+const GetStartedWizard = ({ onClose, prefill }: { onClose: () => void; prefill?: OverlayPrefill | null }) => {
   const router = useRouter();
   const goAudit = () => {
     onClose();
@@ -53,6 +53,9 @@ const GetStartedWizard = ({ onClose }: { onClose: () => void }) => {
         <button className="xp-close" onClick={onClose} aria-label="Close">✕</button>
       </div>
       <div className="wiz-body">
+        {prefill?.summary && step < 4 && (
+          <div className="ov-prefill"><span>Your audit recommendation</span><strong>{prefill.summary}</strong></div>
+        )}
         {step < 4 && (
           <>
             <div className="wiz-progress">

@@ -2,17 +2,19 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowR, BankIc, BuildingIc, ChartIc, DocIc, HomeIc, PeopleIc, ShieldIc, TickIc, TimerIc, WalletIc, type IconType } from "@/components/ui/icons";
+import { ArrowR, BankIc, BuildingIc, ChartIc, HomeIc, PeopleIc, TickIc, WalletIc, type IconType } from "@/components/ui/icons";
 import { Btn } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { fmtN } from "@/lib/format";
 import { useOverlay } from "@/context/OverlayProvider";
 
 const PRESETS = [
-  { name: "Home · 5kVA hybrid", cost: 8500000 },
-  { name: "Home · 10kVA duplex", cost: 14500000 },
-  { name: "SME · 15kVA three-phase", cost: 21500000 },
-  { name: "Commercial · 60kW plant", cost: 78000000 },
+  { name: "Starter · 2.5kVA", cost: 1450000 },
+  { name: "Home · 3.5kVA hybrid", cost: 2200000 },
+  { name: "Home · 5kVA hybrid", cost: 3200000 },
+  { name: "Home · 10kVA duplex", cost: 5900000 },
+  { name: "SME · 15kVA 3-phase", cost: 9800000 },
+  { name: "Commercial · 30kVA", cost: 18500000 },
 ];
 const STEPS = [
   ["Free energy audit", "We size the right system from your real load — so you finance exactly what you need, not more."],
@@ -27,9 +29,21 @@ const PLANS = [
   [BankIc, "Lease-to-own", "Little-to-no upfront. Pay a fixed monthly fee and own the system at the end.", ""],
   [ChartIc, "Corporate PPA", "For large facilities. Pay only for the energy produced — we own and maintain the plant.", ""],
 ] as [IconType, string, string, string][];
-const QUALIFY = [
-  "A completed Forra energy audit", "Valid government ID (NIN / driver's licence / passport)",
-  "3–6 months of bank statements", "Proof of address or utility bill", "For businesses: CAC registration",
+const QUALIFY_COMMON = [
+  "A completed Forra energy audit",
+  "Valid government ID — NIN, driver's licence or passport",
+  "Proof of address or a recent utility bill",
+  "3–6 months of bank statements",
+];
+const QUALIFY_EMPLOYEE = [
+  "Your last 3 months' payslips",
+  "An employment offer or confirmation letter",
+  "Employer name and HR contact (for verification)",
+];
+const QUALIFY_BUSINESS = [
+  "CAC registration (business name or company)",
+  "6 months of business bank statements",
+  "Recent management accounts, if available",
 ];
 const FAQS = [
   ["Do I need collateral?", "Most residential FlexiPay plans are unsecured — the system itself is the security. Larger commercial facilities may have different terms, confirmed during review."],
@@ -151,17 +165,40 @@ const FinancingContent = () => {
           <div>
             <Eyebrow>Eligibility</Eyebrow>
             <h2>What you'll need to qualify.</h2>
-            <p className="lead">Straightforward requirements, no runaround. Have these ready and approval on a home plan is typically 48 hours.</p>
+            <p className="lead">Straightforward requirements, no runaround. Whether you earn a salary or run a business, have these ready and approval on a home plan is typically 48 hours.</p>
             <div className="fin-cta-row">
               <Btn onClick={openStart}>Start my application</Btn>
               <Btn kind="outline" onClick={openExpert}>Ask a question</Btn>
             </div>
           </div>
-          <ul className="check-list">
-            {QUALIFY.map((q) => (
-              <li key={q}><span className="check-ic"><TickIc size={16} color="#0A7A50" /></span>{q}</li>
-            ))}
-          </ul>
+          <div className="elig-lists">
+            <div className="elig-group">
+              <h4 className="elig-h"><span className="elig-tag">Everyone</span></h4>
+              <ul className="check-list">
+                {QUALIFY_COMMON.map((q) => (
+                  <li key={q}><span className="check-ic"><TickIc size={16} color="#0A7A50" /></span>{q}</li>
+                ))}
+              </ul>
+            </div>
+            <div className="elig-two">
+              <div className="elig-group">
+                <h4 className="elig-h"><PeopleIc size={16} color="#0A7A50" />Salary earners</h4>
+                <ul className="check-list check-list--sm">
+                  {QUALIFY_EMPLOYEE.map((q) => (
+                    <li key={q}><span className="check-ic"><TickIc size={15} color="#0A7A50" /></span>{q}</li>
+                  ))}
+                </ul>
+              </div>
+              <div className="elig-group">
+                <h4 className="elig-h"><BuildingIc size={16} color="#0A7A50" />Business owners</h4>
+                <ul className="check-list check-list--sm">
+                  {QUALIFY_BUSINESS.map((q) => (
+                    <li key={q}><span className="check-ic"><TickIc size={15} color="#0A7A50" /></span>{q}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

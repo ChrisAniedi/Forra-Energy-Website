@@ -93,7 +93,7 @@ const ContactContent = () => {
                   <div><label>{l}</label><strong>{v}</strong><em>{n}</em></div>
                 </div>
               ))}
-              <button className="btn btn--gold rail-cta" onClick={openExpert}><span>Book a free consultation</span><ArrowR size={16} /></button>
+              <button className="btn btn--gold rail-cta" onClick={() => openExpert()}><span>Book a free consultation</span><ArrowR size={16} /></button>
               <p className="rail-note"><ShieldIc size={13} /> 15 minutes with an engineer — not a salesperson.</p>
             </div>
             <div className="ct-support">
@@ -127,7 +127,7 @@ const ContactContent = () => {
                       <h3>{o.city}</h3>
                     </div>
                     {o.book
-                      ? <button className="eco-link" onClick={openExpert}>Book a visit<ArrowR size={14} /></button>
+                      ? <button className="eco-link" onClick={() => openExpert()}>Book a visit<ArrowR size={14} /></button>
                       : <button className="eco-link">Directions<ArrowR size={14} /></button>}
                   </div>
                   <p className="office2-addr"><PinIc size={15} color="#5C6B62" />{o.addr}</p>

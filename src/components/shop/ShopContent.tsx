@@ -99,7 +99,7 @@ const ShopContent = () => {
           </div>
           <div className="pr-meta">
             <p className="pr-count">Showing {list.length} of {PACKAGES.length} systems{wish.length > 0 ? ` · ${wish.length} saved` : ""}</p>
-            <button className="eco-link" onClick={openStart}>Not sure? Run a free audit<ArrowR size={14} /></button>
+            <button className="eco-link" onClick={() => openStart()}>Not sure? Run a free audit<ArrowR size={14} /></button>
           </div>
 
           {list.length === 0 ? (

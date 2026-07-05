@@ -5,8 +5,9 @@ import { useEscapeKey, useScrollLock } from "@/lib/hooks";
 import { useState } from "react";
 import { MonitorIc, PhoneIc, ShieldIc, TickIc, WaIc, type IconType } from "@/components/ui/icons";
 import { Btn } from "@/components/ui/Button";
+import type { OverlayPrefill } from "@/context/OverlayProvider";
 
-const ExpertPanel = ({ onClose }: { onClose: () => void }) => {
+const ExpertPanel = ({ onClose, prefill }: { onClose: () => void; prefill?: OverlayPrefill | null }) => {
   useScrollLock();
   const [topic, setTopic] = useState("New installation");
   const [channel, setChannel] = useState("WhatsApp");
@@ -30,6 +31,9 @@ const ExpertPanel = ({ onClose }: { onClose: () => void }) => {
         </div>
         {!done ? (
           <div className="xp-body">
+            {prefill?.summary && (
+              <div className="ov-prefill"><span>Your audit recommendation</span><strong>{prefill.summary}</strong></div>
+            )}
             <div className="xp-group">
               <label>What's this about?</label>
               <div className="chip-row">

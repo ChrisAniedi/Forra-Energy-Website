@@ -76,6 +76,7 @@ export const APPLIANCES: Appliance[] = [
   { id: "pa", name: "PA system", watts: 500, hours: 5, cat: "Other" },
   { id: "cpap", name: "CPAP device", watts: 60, hours: 8, cat: "Other" },
   { id: "oxygen", name: "Oxygen concentrator", watts: 300, hours: 12, cat: "Other" },
+  { id: "generic", name: "General appliance", watts: 300, hours: 4, cat: "Other" },
 ];
 
 /** A ready-made load profile the user can start from instead of building from scratch. */
@@ -117,6 +118,8 @@ export type SystemType = (typeof SYSTEM_TYPES)[number]["key"];
 
 /* --- pricing constants — clearly-marked ESTIMATES, refined at survey --- */
 const PRICE = { perKva: 90000, panel: 100000, panelW: 550, installPct: 0.16 };
+/** Design reserve added to daily energy — headroom for unforeseen/occasional loads. */
+export const RESERVE = 0.1;
 const STD_KVA = [1.5, 2.5, 3.5, 5, 7.5, 10, 15, 20, 30, 40, 50];
 const FIN_MARKUP = 1.2; // illustrative financing markup across the term
 
@@ -161,11 +164,13 @@ export function calcAudit(inp: AuditInput): AuditResult {
   const empty = load.length === 0 || dailyKwh === 0;
   const inverterKva = empty ? 0 : roundKva(peakKw / 0.8);
 
-  const usableKwh = dailyKwh * (backupHours / 24);
+  // size battery + panels against a design load that includes a reserve for unforeseen use
+  const designKwh = dailyKwh * (1 + RESERVE);
+  const usableKwh = designKwh * (backupHours / 24);
   const batteryKwh = system === "On-grid" || empty ? 0 : ceilTo(usableKwh / CHEMS[chem].dod, 0.5);
 
   const derate = system === "Off-grid" ? 0.72 : 0.8;
-  const panelKw = empty ? 0 : dailyKwh / (sunHours * derate);
+  const panelKw = empty ? 0 : designKwh / (sunHours * derate);
   const panelCount = empty ? 0 : Math.max(2, Math.ceil((panelKw * 1000) / PRICE.panelW));
   const arrayKw = (panelCount * PRICE.panelW) / 1000;
   const dailyGen = +(arrayKw * sunHours * 0.75).toFixed(1);

@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
-  APPLIANCES, CATEGORIES, CAT_ICON, CHEMS, FIN_TERMS, PRESETS, STATES, SUN_HOURS, SYSTEM_TYPES,
+  APPLIANCES, CATEGORIES, CAT_ICON, CHEMS, FIN_TERMS, PRESETS, RESERVE, STATES, SUN_HOURS, SYSTEM_TYPES,
   calcAudit, financingMonthly, type ChemKey, type LoadItem, type SystemType,
 } from "@/components/audit/appliances";
 import { fmtN } from "@/lib/format";
@@ -23,6 +23,10 @@ const AuditContent = () => {
   const [cat, setCat] = useState<string>(CATEGORIES[0]);
   const [load, setLoad] = useState<LoadItem[]>([]);
   const [term, setTerm] = useState(24);
+  const [cName, setCName] = useState("");
+  const [cWatts, setCWatts] = useState("");
+  const [cHours, setCHours] = useState("");
+  const customSeq = useRef(0);
 
   const sunHours = SUN_HOURS[state] ?? 5;
   const onGrid = system === "On-grid";
@@ -43,6 +47,14 @@ const AuditContent = () => {
   const remove = (id: string) => setLoad((prev) => prev.filter((p) => p.id !== id));
   const applyPreset = (items: [string, number][]) =>
     setLoad(items.map(([id, qty]) => ({ ...APPLIANCES.find((a) => a.id === id)!, qty })));
+  const addCustom = () => {
+    const w = Math.round(+cWatts);
+    const h = Math.max(0, Math.min(24, +cHours || 0));
+    if (!cName.trim() || !w || w <= 0) return;
+    customSeq.current += 1;
+    setLoad((prev) => [...prev, { id: `custom-${customSeq.current}`, name: cName.trim(), watts: w, hours: h || 1, cat: "Custom", qty: 1 }]);
+    setCName(""); setCWatts(""); setCHours("");
+  };
 
   const res = useMemo(
     () => calcAudit({ load, chem, system, backupHours: backup, sunHours, currentSpend: bill + fuel }),
@@ -50,6 +62,9 @@ const AuditContent = () => {
   );
   const monthly = financingMonthly(res.total, term);
   const qtyOf = (id: string) => load.find((p) => p.id === id)?.qty ?? 0;
+  const recoSummary = res.empty
+    ? ""
+    : `${res.inverterKva} kVA ${system}${res.batteryKwh > 0 ? ` · ${res.batteryKwh} kWh ${chem}` : ""} · est. ${fmtN(res.costLow)}–${fmtN(res.costHigh)}`;
 
   return (
     <main className="page">
@@ -149,6 +164,16 @@ const AuditContent = () => {
                   );
                 })}
               </div>
+              <div className="aud-custom">
+                <label>Not on the list? Add your own</label>
+                <div className="aud-custom-row">
+                  <input className="aud-custom-name" placeholder="e.g. Visitor's laptop" value={cName} onChange={(e) => setCName(e.target.value)} />
+                  <input type="number" min={0} placeholder="Watts" value={cWatts} onChange={(e) => setCWatts(e.target.value)} />
+                  <input type="number" min={0} max={24} step={0.5} placeholder="Hrs/day" value={cHours} onChange={(e) => setCHours(e.target.value)} />
+                  <button type="button" className="aud-custom-add" onClick={addCustom}>Add</button>
+                </div>
+                <p className="aud-custom-hint">Sizing already adds a {Math.round(RESERVE * 100)}% reserve for unforeseen appliances — this is for loads you know about but don&apos;t see above.</p>
+              </div>
             </div>
 
             <div className="aud-card">
@@ -243,8 +268,8 @@ const AuditContent = () => {
                   )}
 
                   <div className="aud-actions">
-                    <button className="btn btn--primary" onClick={openStart}><span>Get this as a quote</span><ArrowR size={16} /></button>
-                    <button className="btn btn--outline" onClick={openExpert}><span>Talk to an expert</span></button>
+                    <button type="button" className="btn btn--primary" onClick={() => openStart({ summary: recoSummary, intent: "quote" })}><span>Get this as a quote</span><ArrowR size={16} /></button>
+                    <button type="button" className="btn btn--outline" onClick={() => openExpert({ summary: recoSummary })}><span>Talk to an expert</span></button>
                   </div>
                 </>
               )}

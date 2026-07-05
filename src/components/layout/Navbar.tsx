@@ -59,8 +59,8 @@ const Navbar = () => {
             <Link href="/shop" className="nav-link">Shop</Link>
           </nav>
           <div className="nav-cta">
-            <button className="btn btn--ghost btn--sm nav-expert" onClick={openExpert}><span>Talk to an Expert</span></button>
-            <button className="btn btn--primary btn--sm" onClick={openStart}><span>Get Started</span><ArrowR size={16} /></button>
+            <button className="btn btn--ghost btn--sm nav-expert" onClick={() => openExpert()}><span>Talk to an Expert</span></button>
+            <button className="btn btn--primary btn--sm" onClick={() => openStart()}><span>Get Started</span><ArrowR size={16} /></button>
           </div>
         </div>
       </div>
