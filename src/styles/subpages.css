@@ -59,3 +59,47 @@
 .res-quote footer em{font-style:normal;font-size:13px;color:var(--sub)}
 
 @media (max-width:900px){.res-sys{grid-template-columns:1fr}}
+
+/* ---- solution page: hero panel + challenge switcher ---- */
+.sol-hero{display:grid;grid-template-columns:1.08fr .92fr;gap:48px;align-items:center}
+.sol-hero-copy{max-width:600px}
+.sol-hero-copy h1{font-size:clamp(32px,4vw,50px)}
+
+/* hero "what we keep running" panel */
+.sol-panel{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:0 34px 70px -34px rgba(11,43,31,.34);padding:18px 20px 20px}
+.sol-panel-bar{display:flex;justify-content:space-between;align-items:center;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.sol-live{display:flex;align-items:center;gap:9px;font-size:12.5px;font-weight:800;color:var(--forest)}
+.sol-panel-tag{font-size:10.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--emerald-d);background:var(--mint);padding:4px 10px;border-radius:999px}
+.sol-loads{list-style:none;display:flex;flex-direction:column}
+.sol-loads li{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px dashed var(--line)}
+.sol-loads li:last-child{border-bottom:0}
+.sol-load-ic{flex-shrink:0;display:grid;place-items:center;width:32px;height:32px;border-radius:9px;background:var(--mint)}
+.sol-load-name{flex:1;font-size:14px;font-weight:600;color:var(--ink)}
+.sol-load-dot{width:8px;height:8px;border-radius:50%;background:var(--emerald);animation:pulse 1.8s infinite;animation-delay:var(--d)}
+.sol-cov{margin-top:14px;background:var(--mist);border-radius:var(--r-sm);padding:13px 15px}
+.sol-cov-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px}
+.sol-cov-top label{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--sub)}
+.sol-cov-top strong{font-family:var(--disp);font-weight:600;font-size:17px;color:var(--emerald-d)}
+.sol-cov-bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.sol-cov-bar span{display:block;height:100%;width:var(--w);border-radius:99px;background:linear-gradient(90deg,var(--emerald),var(--emerald-d));animation:solGrow 1.2s cubic-bezier(.2,.7,.2,1)}
+@keyframes solGrow{from{width:0}}
+
+/* interactive challenge switcher */
+.sol-ch-list{list-style:none;display:flex;flex-direction:column;gap:6px;margin-top:26px}
+.sol-ch-list li{display:flex;align-items:center;gap:14px;padding:15px 16px;border-radius:var(--r-md);cursor:pointer;border:1px solid transparent;transition:all .2s ease;color:var(--sub);font-size:15px;font-weight:600}
+.sol-ch-list li:hover{color:var(--ink)}
+.sol-ch-list li.on{background:#fff;border-color:var(--line);box-shadow:0 12px 26px -18px rgba(11,43,31,.28);color:var(--ink)}
+.sol-ch-num{font-family:var(--disp);font-weight:600;color:#B9C6BD;font-size:14px}
+.sol-ch-list li.on .sol-ch-num{color:var(--emerald-d)}
+.sol-ch-panel{align-self:center;background:var(--forest);color:#EAF6F0;border-radius:var(--r-lg);padding:30px;min-height:196px;display:flex;flex-direction:column;justify-content:center;box-shadow:0 30px 64px -34px rgba(11,43,31,.5)}
+.sol-ch-tag{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#8FD8B8;margin-bottom:16px}
+.sol-ch-panel p{font-family:var(--disp);font-weight:500;font-size:clamp(18px,1.9vw,22px);line-height:1.45;color:#fff;text-wrap:pretty;animation:solFade .45s ease}
+@keyframes solFade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+@media (max-width:900px){
+  .sol-hero{grid-template-columns:1fr;gap:32px}
+  .sol-panel{max-width:520px}
+}
+@media (prefers-reduced-motion:reduce){
+  .sol-cov-bar span,.sol-ch-panel p,.sol-load-dot{animation:none}
+}
