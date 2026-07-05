@@ -11,7 +11,7 @@ const SavingsCalculatorContent = () => {
   const { openStart } = useOverlay();
   const [bill, setBill] = useState(120000);
   const [fuel, setFuel] = useState(80000);
-  const [cover, setCover] = useState(85);
+  const [cover, setCover] = useState(20);
 
   const current = bill + fuel;
   const monthlySave = Math.round((current * cover) / 100);
@@ -61,7 +61,7 @@ const SavingsCalculatorContent = () => {
             </div>
             <div className="fin-slider">
               <div className="fin-slider-top"><label>Share of load on solar</label><strong>{cover}%</strong></div>
-              <input type="range" min={60} max={95} step={5} value={cover} onChange={(e) => setCover(+e.target.value)} />
+              <input type="range" min={20} max={95} step={5} value={cover} onChange={(e) => setCover(+e.target.value)} />
             </div>
             <div className="fin-result">
               <span>Estimated annual savings</span>

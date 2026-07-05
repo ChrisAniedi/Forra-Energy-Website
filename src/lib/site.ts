@@ -2,8 +2,8 @@
 export const SITE = {
   name: "Forra Energy",
   tagline: "Africa's Intelligent Energy Platform",
-  phoneDisplay: "+234 901 234 5678",
-  phoneHref: "tel:+2349012345678",
+  phoneDisplay: "+234 903 526 6832",
+  phoneHref: "tel:+2349035266832",
   email: "hello@forra.energy",
   supportEmail: "support@forra.energy",
   hq: {

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { GuidesContent } from "@/components/resources/lists";
+import ResourceList from "@/components/resources/ResourceList";
+import { GUIDES } from "@/components/resources/content";
 
 export const metadata: Metadata = {
   title: "Energy Guides",
@@ -8,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function GuidesPage() {
-  return <GuidesContent />;
+  return <ResourceList data={GUIDES} />;
 }

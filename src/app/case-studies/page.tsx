@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { CaseStudiesContent } from "@/components/resources/lists";
+import ResourceList from "@/components/resources/ResourceList";
+import { CASE_STUDIES } from "@/components/resources/content";
 
 export const metadata: Metadata = {
   title: "Case Studies",
@@ -8,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function CaseStudiesPage() {
-  return <CaseStudiesContent />;
+  return <ResourceList data={CASE_STUDIES} />;
 }

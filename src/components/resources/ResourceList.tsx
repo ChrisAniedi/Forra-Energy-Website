@@ -4,20 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import { ArrowR, TickIc } from "@/components/ui/icons";
 import { Eyebrow } from "@/components/ui/Eyebrow";
+import type { Collection } from "@/components/resources/content";
 
-export interface ResourceItem { title: string; category: string; blurb: string; meta: string }
-export interface ResourceListData {
-  eyebrow: string;
-  h1: string;
-  intro: string;
-  points: string[];
-  categories: string[];
-  items: ResourceItem[];
-  ctaTitle: string;
-  ctaText: string;
-}
-
-const ResourceList = ({ data }: { data: ResourceListData }) => {
+const ResourceList = ({ data }: { data: Collection }) => {
   const [cat, setCat] = useState("All");
   const list = cat === "All" ? data.items : data.items.filter((i) => i.category === cat);
 
@@ -48,12 +37,12 @@ const ResourceList = ({ data }: { data: ResourceListData }) => {
           </div>
           <div className="res-grid">
             {list.map((it) => (
-              <article className="res-card" key={it.title}>
+              <Link className="res-card" href={`${data.base}/${it.slug}`} key={it.slug}>
                 <span className="res-cat">{it.category}</span>
                 <h3>{it.title}</h3>
                 <p>{it.blurb}</p>
-                <span className="res-meta">{it.meta}</span>
-              </article>
+                <span className="res-foot"><em>{it.meta}</em><span className="res-go">Read<ArrowR size={14} /></span></span>
+              </Link>
             ))}
           </div>
         </div>

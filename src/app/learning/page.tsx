@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { LearningContent } from "@/components/resources/lists";
+import ResourceList from "@/components/resources/ResourceList";
+import { LEARNING } from "@/components/resources/content";
 
 export const metadata: Metadata = {
   title: "Solar Learning Hub",
@@ -8,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function LearningPage() {
-  return <LearningContent />;
+  return <ResourceList data={LEARNING} />;
 }

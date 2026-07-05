@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { BlogContent } from "@/components/resources/lists";
+import ResourceList from "@/components/resources/ResourceList";
+import { BLOG } from "@/components/resources/content";
 
 export const metadata: Metadata = {
   title: "Blog",
@@ -8,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function BlogPage() {
-  return <BlogContent />;
+  return <ResourceList data={BLOG} />;
 }
