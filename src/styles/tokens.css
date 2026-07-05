@@ -1,0 +1,11 @@
+/* Design tokens — colors, radii, type stacks. */
+:root {
+  --forest:#0B2B1F; --forest-2:#0E3A2A; --emerald:#0FA36B; --emerald-d:#0A7A50;
+  --gold:#F2A91C; --gold-d:#C8880D; --sky:#4C9EEB;
+  --ink:#13201A; --sub:#5C6B62; --mist:#F3F6F4; --line:#E3EAE5; --white:#FFFFFF;
+  --mint:#EAF6F0; --gold-t:#FDF3DC; --sky-t:#E9F2FB;
+  --r-lg:24px; --r-md:18px; --r-sm:12px;
+  --disp:'Clash Display', 'Segoe UI', sans-serif;
+  --body:'Satoshi', 'Segoe UI', sans-serif;
+  --shadow:0 20px 50px -24px rgba(11,43,31,.22);
+}

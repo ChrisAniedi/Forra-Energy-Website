@@ -1,0 +1,41 @@
+/* Reset, typography, buttons, shared primitives. */
+*{box-sizing:border-box;margin:0;padding:0}
+body {
+  font-family: var(--body);
+  color: var(--ink);
+  background: var(--white);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.55;
+  font-size: 16px;
+}
+
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+input{font-family:inherit}
+a{text-decoration:none;color:inherit}
+:focus-visible{outline:2px solid var(--emerald);outline-offset:3px;border-radius:6px}
+.container{max-width:1180px;margin:0 auto;padding:0 28px}
+
+/* type */
+h1,h2,h3{font-family:var(--disp);font-weight:600;letter-spacing:-0.02em;color:var(--ink)}
+h1{font-size:clamp(38px,4.8vw,62px);line-height:1.06;letter-spacing:-0.025em}
+h2{font-size:clamp(30px,3.6vw,46px);line-height:1.08}
+h3{font-size:19px;font-weight:500;letter-spacing:-0.01em}
+.gold{color:var(--gold)}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--emerald-d);margin-bottom:18px}
+.eyebrow-dot{width:7px;height:7px;border-radius:50%;background:var(--emerald)}
+.eyebrow--light{color:#8FD8B8}
+.eyebrow--light .eyebrow-dot{background:var(--gold)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:9px;font-weight:700;font-size:15px;border-radius:999px;padding:15px 26px;transition:transform .18s ease, box-shadow .18s ease, background .18s ease}
+.btn--sm{padding:11px 19px;font-size:14px}
+.btn--primary{background:var(--forest);color:#fff}
+.btn--primary:hover{background:var(--forest-2);transform:translateY(-1px);box-shadow:0 12px 26px -12px rgba(11,43,31,.5)}
+.btn--outline{border:1.5px solid var(--line);color:var(--ink);background:#fff}
+.btn--outline:hover{border-color:var(--emerald);color:var(--emerald-d)}
+.btn--ghost{color:var(--ink);background:transparent}
+.btn--ghost:hover{color:var(--emerald-d)}
+.btn--gold{background:var(--gold);color:var(--forest)}
+.btn--gold:hover{background:#FFBC33;transform:translateY(-1px);box-shadow:0 12px 28px -12px rgba(242,169,28,.6)}
+.btn--glass{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:#fff;backdrop-filter:blur(8px)}
+.btn--glass:hover{background:rgba(255,255,255,.16)}

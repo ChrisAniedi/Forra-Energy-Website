@@ -1,0 +1,55 @@
+/* Consolidated responsive rules. Breakpoints: 1040 / 860 / 620. */
+
+/* — layout + homepage — */
+@media (max-width:1040px){
+  .eco-grid{grid-template-columns:repeat(2,1fr)}
+  .why-grid,.proj-grid,.test-grid{grid-template-columns:repeat(2,1fr)}
+  .res-grid,.ind-grid{grid-template-columns:repeat(2,1fr)}
+  .metrics{grid-template-columns:repeat(3,1fr);row-gap:26px}
+  .proc-track{grid-template-columns:repeat(4,1fr);row-gap:34px}
+  .proc-line{display:none}
+  .foot-grid{grid-template-columns:repeat(3,1fr)}
+  .nav-links{display:none}
+}
+@media (max-width:860px){
+  .hero{padding-top:126px}
+  .split,.intel-grid{grid-template-columns:1fr;gap:44px}
+  .split--rev{direction:ltr}
+  .cmd-grid{grid-template-columns:1fr;gap:18px}
+  .section{padding:76px 0}
+  .nav-expert{display:none}
+  .topbar-tag,.topbar-mail{display:none}
+}
+@media (max-width:620px){
+  .topbar{display:none}
+  .hero{padding-top:122px}
+  .eco-grid,.why-grid,.proj-grid,.test-grid,.res-grid,.ind-grid{grid-template-columns:1fr}
+  .metrics{grid-template-columns:repeat(2,1fr)}
+  .proc-track{grid-template-columns:repeat(2,1fr)}
+  .intel-feats{grid-template-columns:1fr}
+  .fin-presets{grid-template-columns:1fr}
+  .calc-stats{grid-template-columns:1fr 1fr}
+  .foot-grid{grid-template-columns:1fr 1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+
+/* — inner pages + overlays — */
+@media (max-width:1040px){
+  .ct-layout{grid-template-columns:1fr;gap:40px}
+  .ct-rail{position:static}
+  .team-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:860px){
+  .page-hero{padding-top:132px}
+  .office-grid{grid-template-columns:1fr}
+  .metrics--about{grid-template-columns:repeat(2,1fr);row-gap:22px}
+  .wiz-summary{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:620px){
+  .team-grid,.wiz-goals,.f-grid,.office-grid{grid-template-columns:1fr}
+  .page-hero{padding-top:118px}
+  .ab-cta{padding:28px}
+  .tl-item{grid-template-columns:64px 1fr;gap:16px}
+}
