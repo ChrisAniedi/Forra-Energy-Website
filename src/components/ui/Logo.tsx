@@ -8,11 +8,10 @@ export const Logo = ({ light = false }: { light?: boolean }) => {
   return (
     <>
       <span className="logo-mark" aria-hidden="true">
-        <svg width="30" height="30" viewBox="0 0 44 44" fill="none">
-          <rect x="6" y="6" width="17" height="17" rx="5" fill={c} />
-          <rect x="21" y="21" width="17" height="17" rx="5" fill={c} />
-          <rect x="24.5" y="6" width="9" height="9" rx="3" fill={c} opacity=".42" />
-          <rect x="10.5" y="24.5" width="9" height="9" rx="3" fill={c} opacity=".42" />
+        <svg width="31" height="31" viewBox="0 0 44 44" fill="none">
+          <rect x="4" y="4" width="16" height="16" rx="4.5" fill={c} />
+          <rect x="24" y="24" width="16" height="16" rx="4.5" fill={c} />
+          <path d="M13.5 18.7 18.7 13.5 30.5 25.3 25.3 30.5Z" fill={c} />
         </svg>
       </span>
       <span className="logo-word">Forra<em>Energy</em></span>
