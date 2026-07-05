@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 /** Full-screen 4-step lead-qualification flow behind every Get Started CTA. */
 import { useEscapeKey, useScrollLock } from "@/lib/hooks";
 import { useState } from "react";
-import { ArrowR, BuildingIc, FlashIc, GaugeIc, HomeIc, MailIc, PhoneIc, TickIc, WaIc, WalletIc, type IconType } from "@/components/ui/icons";
+import { ArrowR, BuildingIc, GaugeIc, HomeIc, MailIc, PhoneIc, TickIc, WaIc, WalletIc, type IconType } from "@/components/ui/icons";
+import { Logo } from "@/components/ui/Logo";
 import { Btn } from "@/components/ui/Button";
 import { useOverlay, type OverlayPrefill } from "@/context/OverlayProvider";
 
@@ -47,8 +48,7 @@ const GetStartedWizard = ({ onClose, prefill }: { onClose: () => void; prefill?:
     <div className="wiz-root" role="dialog" aria-modal="true" aria-label="Get started">
       <div className="wiz-top">
         <a className="logo" href="#" onClick={(e) => e.preventDefault()}>
-          <span className="logo-mark"><FlashIc size={16} color="#0B2B1F" /></span>
-          <span className="logo-word">Forra<em>Energy</em></span>
+          <Logo />
         </a>
         <button className="xp-close" onClick={onClose} aria-label="Close">✕</button>
       </div>

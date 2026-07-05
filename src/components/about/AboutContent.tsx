@@ -16,10 +16,11 @@ const VALUES = [
   [LeafIc, "Sustainability that pays", "Carbon impact matters — but we design so that doing the right thing is also the cheaper thing."],
 ] as [IconType, string, string][];
 const TEAM = [
-  { n: "Olumide Adeyemi", r: "Co-founder & CEO", b: "Ex-power infrastructure. Spent a decade on national grid projects before betting on distributed energy.", init: "OA" },
-  { n: "Chiamaka Eze", r: "Co-founder & CTO", b: "Built fintech platforms for a decade. Now builds the software layer that makes energy intelligent.", init: "CE" },
+  { n: "Christopher Aniedi", r: "Co-founder & CEO", b: "Founder and operator. Started Forra to make reliable, clean power the default for African homes and businesses — not a luxury.", init: "CA" },
+  { n: "Olumide Adeyemi", r: "Co-founder & CTO", b: "Ex-power infrastructure. Spent a decade on national grid projects before betting on distributed energy.", init: "OA" },
+  { n: "Chiamaka Eze", r: "Head of Financing", b: "A decade building fintech platforms. Now designs the financing that puts clean energy within reach.", init: "CE" },
   { n: "Ibrahim Suleiman", r: "Head of Engineering", b: "COREN-certified. Has personally commissioned over 250 hybrid systems across 12 states.", init: "IS" },
-  { n: "Ronke Oladipo", r: "Head of Financing", b: "Structured consumer credit at two Nigerian banks. Designs plans people can actually keep.", init: "RO" },
+  { n: "Ronke Oladipo", r: "Head of Sales", b: "Turns complex energy decisions into clear, honest choices for homes and businesses — no overselling, ever.", init: "RO" },
 ];
 const MILESTONES = [
   ["2022", "Founded in Lagos", "Three engineers, one van, and a conviction that energy should be intelligent."],

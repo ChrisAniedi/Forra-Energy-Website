@@ -62,8 +62,8 @@
 .metrics--about{margin-top:0;border-top:none;padding-top:0;grid-template-columns:repeat(4,1fr)}
 .ab-story p{color:var(--sub);font-size:16px;margin-bottom:16px;line-height:1.7}
 .ab-story strong{color:var(--ink)}
-.team-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
-.team-card{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:26px}
+.team-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:18px}
+.team-card{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:26px;flex:1 1 300px;max-width:372px}
 .team-avatar{width:62px;height:62px;border-radius:20px;background:linear-gradient(135deg,var(--emerald),var(--forest));color:#fff;display:grid;place-items:center;font-family:var(--disp);font-weight:600;font-size:19px;margin-bottom:16px}
 .team-card h3{font-size:17px}
 .team-card em{display:block;font-style:normal;font-size:12.5px;font-weight:800;color:var(--emerald-d);text-transform:uppercase;letter-spacing:.05em;margin:4px 0 10px}

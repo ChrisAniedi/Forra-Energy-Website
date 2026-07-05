@@ -5,7 +5,8 @@ import { useEffect, useState, type MouseEvent } from "react";
 import { NAV, NAV_ROUTES } from "@/lib/navigation";
 import { SITE } from "@/lib/site";
 import { useOverlay } from "@/context/OverlayProvider";
-import { ArrowR, ChevD, FlashIc, MailIc, PeopleIc, PhoneIc, PinIc } from "@/components/ui/icons";
+import { ArrowR, ChevD, MailIc, PeopleIc, PhoneIc, PinIc } from "@/components/ui/icons";
+import { Logo } from "@/components/ui/Logo";
 
 const DropItem = ({ item }: { item: string }) => {
   const route = NAV_ROUTES[item];
@@ -44,8 +45,7 @@ const Navbar = () => {
       <div className="nav-main">
         <div className="container nav-inner">
           <Link className="logo" href="/">
-            <span className="logo-mark"><FlashIc size={16} color="#0B2B1F" /></span>
-            <span className="logo-word">Forra<em>Energy</em></span>
+            <Logo />
           </Link>
           <nav className="nav-links">
             {NAV.map((g) => (

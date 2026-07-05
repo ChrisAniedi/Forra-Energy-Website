@@ -4,7 +4,8 @@ import Link from "next/link";
 import type { MouseEvent } from "react";
 import { NAV, NAV_ROUTES } from "@/lib/navigation";
 import { SITE } from "@/lib/site";
-import { FlashIc, MailIc, PinIc, WaIc } from "@/components/ui/icons";
+import { MailIc, PinIc, WaIc } from "@/components/ui/icons";
+import { Logo } from "@/components/ui/Logo";
 
 const FootLink = ({ item }: { item: string }) => {
   const route = NAV_ROUTES[item];
@@ -21,8 +22,7 @@ const Footer = () => (
     <div className="container foot-grid">
       <div className="foot-brand">
         <Link className="logo logo--light" href="/">
-          <span className="logo-mark"><FlashIc size={16} color="#0B2B1F" /></span>
-          <span className="logo-word">Forra<em>Energy</em></span>
+          <Logo light />
         </Link>
         <p>Africa's intelligent energy platform. Generate, finance, manage and optimize clean energy — all in one place.</p>
         <div className="foot-contact">

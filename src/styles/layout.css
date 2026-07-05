@@ -14,7 +14,7 @@ a.topbar-portal:hover{color:#FFBC33}
 .site-head--scrolled .nav-main{background:rgba(255,255,255,.85);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);padding:10px 0}
 .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:24px}
 .logo{display:flex;align-items:center;gap:10px}
-.logo-mark{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,#3FD79B,var(--gold));display:grid;place-items:center}
+.logo-mark{width:32px;height:32px;display:grid;place-items:center;flex-shrink:0}
 .logo-word{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:-.01em}
 .logo-word em{font-style:normal;color:var(--emerald-d);font-weight:500}
 .logo--light .logo-word{color:#fff}
