@@ -27,6 +27,9 @@ export const NAV_ROUTES: Record<string, string> = {
   "Real Estate": "/real-estate",
   "Religious Organizations": "/religious",
   About: "/about",
+  Projects: "/projects",
+  Partners: "/partners",
+  Careers: "/careers",
   Contact: "/contact",
   "Client Portal": "/portal",
 };
