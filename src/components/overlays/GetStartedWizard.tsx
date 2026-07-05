@@ -23,7 +23,7 @@ const GetStartedWizard = ({ onClose }: { onClose: () => void }) => {
   const router = useRouter();
   const goAudit = () => {
     onClose();
-    router.push("/#audit"); // retarget to /audit when the standalone tool ships
+    router.push("/audit");
   };
   useScrollLock();
   const [step, setStep] = useState(0);

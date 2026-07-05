@@ -12,6 +12,7 @@ export const NAV: NavGroup[] = [
 
 /** Items with live routes. Everything else renders as a disabled link until its page ships. */
 export const NAV_ROUTES: Record<string, string> = {
+  "Energy Audit": "/audit",
   About: "/about",
   "Solar Systems": "/shop",
   Contact: "/contact",

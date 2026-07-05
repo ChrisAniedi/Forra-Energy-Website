@@ -13,6 +13,32 @@
 .trust{list-style:none;display:flex;justify-content:center;flex-wrap:wrap;gap:10px 22px;margin-top:28px}
 .trust li{display:flex;align-items:center;gap:7px;font-size:13.5px;font-weight:500;color:var(--sub)}
 
+/* hero social proof */
+.hero-proof{display:inline-flex;align-items:center;gap:8px;margin-bottom:20px;padding:4px 12px 4px 6px;background:rgba(255,255,255,.7);border:1px solid var(--line);border-radius:999px;box-shadow:0 6px 18px -14px rgba(11,43,31,.3)}
+.hero-avatars{display:flex}
+.hero-av{width:20px;height:20px;border-radius:50%;border:1.5px solid #fff;margin-left:-7px;background-size:cover}
+.hero-av:first-child{margin-left:0}
+.hero-av--a{background:linear-gradient(135deg,#0FA36B,#0B2B1F)}
+.hero-av--b{background:linear-gradient(135deg,#F2A91C,#C8880D)}
+.hero-av--c{background:linear-gradient(135deg,#4C9EEB,#2F6FB0)}
+.hero-av--d{background:linear-gradient(135deg,#0E3A2A,#0FA36B)}
+.hero-proof-txt{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--sub);font-weight:500}
+.hero-proof-txt strong{color:var(--ink);font-weight:700}
+.hero-stars{color:var(--gold);letter-spacing:.5px;font-size:10.5px}
+
+/* hero entrance */
+@keyframes heroUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.hero-center>*{animation:heroUp .7s cubic-bezier(.2,.7,.2,1) both}
+.hero-center>*:nth-child(1){animation-delay:.02s}
+.hero-center>*:nth-child(2){animation-delay:.09s}
+.hero-center>*:nth-child(3){animation-delay:.16s}
+.hero-center>*:nth-child(4){animation-delay:.23s}
+.hero-center>*:nth-child(5){animation-delay:.30s}
+.hero-center>*:nth-child(6){animation-delay:.37s}
+.hero-center>*:nth-child(7){animation-delay:.44s}
+.cmd{animation:heroUp .8s cubic-bezier(.2,.7,.2,1) .42s both}
+@media (prefers-reduced-motion:reduce){.hero-center>*,.cmd{animation:none}}
+
 /* command center */
 .cmd{position:relative;margin:64px auto 0;max-width:980px;background:rgba(255,255,255,.9);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.85);border-radius:var(--r-lg);box-shadow:0 44px 90px -34px rgba(11,43,31,.32);padding:20px 22px 22px}
 .cmd-bar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;padding-bottom:16px;border-bottom:1px solid var(--line);margin-bottom:18px}

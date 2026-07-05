@@ -1,10 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { ArrowR, BatteryIc, DocIc, FlashIc, SunIc, TickIc, type IconType } from "@/components/ui/icons";
-import { Btn } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/Eyebrow";
-import { useOverlay } from "@/context/OverlayProvider";
 
 const AUDIT_STEPS = [
   { t: "Appliances & usage", d: "Fridge, ACs, pumping machine, TVs — we estimate your daily kWh from what you actually run." },
@@ -13,7 +12,6 @@ const AUDIT_STEPS = [
   { t: "Your report", d: "A professional assessment report you can download, share and finance against." },
 ];
 const AuditSection = () => {
-  const { openStart } = useOverlay();
   const [step, setStep] = useState(0);
   useEffect(() => {
     const t = setInterval(() => setStep((s) => (s + 1) % AUDIT_STEPS.length), 3400);
@@ -38,7 +36,7 @@ const AuditSection = () => {
               </li>
             ))}
           </ol>
-          <Btn onClick={openStart}>Launch Free Energy Audit</Btn>
+          <Link href="/audit" className="btn btn--primary"><span>Launch Free Energy Audit</span><ArrowR size={17} /></Link>
         </div>
         <div className="audit-ui">
           <div className="audit-window">

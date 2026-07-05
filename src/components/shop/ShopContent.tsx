@@ -1,27 +1,61 @@
 "use client";
 
-import { useState } from "react";
-import { PACKAGES, SIZE_BANDS, type Package } from "@/components/shop/packages";
+import { useMemo, useState } from "react";
+import { PACKAGES, SIZE_BANDS, monthlyFrom, type Package } from "@/components/shop/packages";
 import { SystemArt } from "@/components/shop/SystemArt";
 import QuotePanel from "@/components/overlays/QuotePanel";
 import { Btn } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/Eyebrow";
+import { fmtN } from "@/lib/format";
 import { useOverlay } from "@/context/OverlayProvider";
-import { ArrowR, GaugeIc, MonitorIc, PeopleIc, SettingIc, ShieldIc, TickIc, WalletIc, type IconType } from "@/components/ui/icons";
+import { ArrowR, GaugeIc, HeartIc, MonitorIc, PeopleIc, SettingIc, ShieldIc, StarIc, TickIc, WalletIc, type IconType } from "@/components/ui/icons";
+
+const SORTS: [string, string][] = [
+  ["popular", "Most popular"], ["price-asc", "Price: low to high"], ["price-desc", "Price: high to low"], ["cap", "Capacity"],
+];
+
+/** Star row — supports a half star for ratings like 4.8. */
+const Stars = ({ rating }: { rating: number }) => (
+  <span className="pr-stars" aria-label={`${rating} out of 5`}>
+    {[0, 1, 2, 3, 4].map((i) => (
+      <span key={i} className={"pr-star" + (rating >= i + 1 ? " full" : rating >= i + 0.5 ? " half" : "")}><StarIc size={13} /></span>
+    ))}
+  </span>
+);
 
 const ShopContent = () => {
   const { openStart, openExpert } = useOverlay();
   const [chem, setChem] = useState("all");
   const [size, setSize] = useState("all");
   const [fit, setFit] = useState("all");
+  const [sort, setSort] = useState("popular");
+  const [wish, setWish] = useState<string[]>([]);
+  const [compare, setCompare] = useState<string[]>([]);
+  const [showCompare, setShowCompare] = useState(false);
   const [quotePkg, setQuotePkg] = useState<Package | null>(null);
+
   const band = SIZE_BANDS.find((b) => b.id === size);
-  const list = PACKAGES.filter((p) =>
-    (chem === "all" || p.chem === chem) &&
-    (size === "all" || (band && band.test && band.test(p.kva))) &&
-    (fit === "all" || p.bestFor === fit || p.bestFor === "both")
-  ).sort((a, b) => a.order - b.order);
+  const list = useMemo(() => {
+    const filtered = PACKAGES.filter((p) =>
+      (chem === "all" || p.chem === chem) &&
+      (size === "all" || (band && band.test && band.test(p.kva))) &&
+      (fit === "all" || p.bestFor === fit || p.bestFor === "both")
+    );
+    const by: Record<string, (a: Package, b: Package) => number> = {
+      popular: (a, b) => a.order - b.order,
+      "price-asc": (a, b) => a.priceFrom - b.priceFrom,
+      "price-desc": (a, b) => b.priceFrom - a.priceFrom,
+      cap: (a, b) => b.kva - a.kva,
+    };
+    return [...filtered].sort(by[sort]);
+  }, [chem, size, fit, sort, band]);
+
   const clear = () => { setChem("all"); setSize("all"); setFit("all"); };
+  const toggleWish = (id: string) => setWish((w) => (w.includes(id) ? w.filter((x) => x !== id) : [...w, id]));
+  const toggleCompare = (id: string) =>
+    setCompare((c) => (c.includes(id) ? c.filter((x) => x !== id) : c.length >= 3 ? c : [...c, id]));
+  const comparePkgs = compare.map((id) => PACKAGES.find((p) => p.id === id)!).filter(Boolean);
+
   return (
     <main className="page">
       <section className="page-hero">
@@ -56,9 +90,15 @@ const ShopContent = () => {
                 {SIZE_BANDS.map((b) => <option key={b.id} value={b.id}>{b.label}</option>)}
               </select>
             </div>
+            <div className="pr-size pr-sort">
+              <label htmlFor="pr-sort-sel">Sort</label>
+              <select id="pr-sort-sel" value={sort} onChange={(e) => setSort(e.target.value)}>
+                {SORTS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+              </select>
+            </div>
           </div>
           <div className="pr-meta">
-            <p className="pr-count">Showing {list.length} of {PACKAGES.length} systems</p>
+            <p className="pr-count">Showing {list.length} of {PACKAGES.length} systems{wish.length > 0 ? ` · ${wish.length} saved` : ""}</p>
             <button className="eco-link" onClick={openStart}>Not sure? Run a free audit<ArrowR size={14} /></button>
           </div>
 
@@ -74,37 +114,57 @@ const ShopContent = () => {
             </div>
           ) : (
             <div className="pr-grid">
-              {list.map((p) => (
-                <article key={p.id} className={"pr-card" + (p.badge === "Most popular" ? " pr-card--pop" : "")}>
-                  {p.badge && <span className="pr-badge">{p.badge}</span>}
-                  <SystemArt p={p} />
-                  <div className="pr-body">
-                    <div className="pr-head">
-                      <h3>{p.name}</h3>
-                      <span className="pr-cap">{p.kva} kVA · {p.kwh} kWh</span>
-                    </div>
-                    <p className="pr-fit">{p.fit}</p>
-                    <div className="pr-powers">
-                      <label>Comfortably powers</label>
-                      <div className="pr-powers-row">
-                        {p.powers.map((Ic, i) => <span key={i} className="pw"><Ic size={15} /></span>)}
+              {list.map((p) => {
+                const saved = wish.includes(p.id);
+                const inCompare = compare.includes(p.id);
+                const inStock = p.stock.toLowerCase().includes("stock");
+                return (
+                  <article key={p.id} className={"pr-card" + (p.badge === "Most popular" ? " pr-card--pop" : "")}>
+                    <button className={"pr-wish" + (saved ? " on" : "")} onClick={() => toggleWish(p.id)} aria-label={saved ? "Remove from saved" : "Save"} aria-pressed={saved}>
+                      <HeartIc size={17} />
+                    </button>
+                    {p.badge && <span className="pr-badge">{p.badge}</span>}
+                    <SystemArt p={p} />
+                    <div className="pr-body">
+                      <div className="pr-head">
+                        <h3>{p.name}</h3>
+                        <span className="pr-cap">{p.kva} kVA · {p.kwh} kWh</span>
                       </div>
-                      <em>{p.powersText}</em>
+                      <div className="pr-rate">
+                        <Stars rating={p.rating} />
+                        <span className="pr-rate-n">{p.rating.toFixed(1)}</span>
+                        <span className="pr-rate-c">({p.reviews})</span>
+                        <span className={"pr-avail" + (inStock ? " in" : " lead")}>{inStock ? "In stock" : p.stock}</span>
+                      </div>
+                      <p className="pr-fit">{p.fit}</p>
+                      <div className="pr-powers">
+                        <label>Comfortably powers</label>
+                        <div className="pr-powers-row">
+                          {p.powers.map((Ic, i) => <span key={i} className="pw"><Ic size={15} /></span>)}
+                        </div>
+                        <em>{p.powersText}</em>
+                      </div>
+                      <div className="pr-price">
+                        <div>
+                          <span className="pr-price-lead">Financing from</span>
+                          <strong>{fmtN(monthlyFrom(p.priceFrom))}<em>/mo</em></strong>
+                        </div>
+                        <span className="pr-price-full">est. {fmtN(p.priceFrom)} turnkey</span>
+                      </div>
+                      <div className="pr-fin"><WalletIc size={15} />Installation, panels &amp; monitoring included</div>
+                      <div className="pr-card-actions">
+                        <button className="btn btn--primary pr-cta" onClick={() => setQuotePkg(p)}><span>Get a Quote</span><ArrowR size={16} /></button>
+                        <button className={"pr-compare" + (inCompare ? " on" : "")} onClick={() => toggleCompare(p.id)} aria-pressed={inCompare}>
+                          {inCompare ? "✓ Comparing" : "Compare"}
+                        </button>
+                      </div>
                     </div>
-                    <div className="pr-specs2">
-                      <div><label>Battery</label><strong>{p.battery}</strong></div>
-                      <div><label>Backup</label><strong>{p.backup}</strong></div>
-                      <div><label>Panels</label><strong>{p.panels}</strong></div>
-                      <div><label>Warranty</label><strong>{p.warranty}</strong></div>
-                    </div>
-                    <div className="pr-fin"><WalletIc size={15} />Flexible financing available</div>
-                    <button className="btn btn--primary pr-cta" onClick={() => setQuotePkg(p)}><span>Get a Quote</span><ArrowR size={16} /></button>
-                  </div>
-                </article>
-              ))}
+                  </article>
+                );
+              })}
             </div>
           )}
-          <p className="pr-note">Every system is sized and confirmed with a free site survey before installation. Detailed pricing, financing plans and timelines come with your quote.</p>
+          <p className="pr-note">Prices are turnkey estimates — every system is sized and confirmed with a free site survey before installation. Detailed pricing, financing plans and timelines come with your quote.</p>
         </div>
       </section>
 
@@ -141,6 +201,75 @@ const ShopContent = () => {
           </div>
         </div>
       </section>
+
+      {/* compare tray */}
+      {comparePkgs.length > 0 && (
+        <div className="pr-tray">
+          <div className="container pr-tray-inner">
+            <div className="pr-tray-items">
+              <span className="pr-tray-label">Compare</span>
+              {comparePkgs.map((p) => (
+                <span key={p.id} className="pr-tray-chip">{p.name}<button onClick={() => toggleCompare(p.id)} aria-label={`Remove ${p.name}`}>✕</button></span>
+              ))}
+              {comparePkgs.length < 3 && <span className="pr-tray-hint">add up to {3 - comparePkgs.length} more</span>}
+            </div>
+            <div className="pr-tray-actions">
+              <button className="pr-tray-clear" onClick={() => setCompare([])}>Clear</button>
+              <button className="btn btn--primary btn--sm" disabled={comparePkgs.length < 2} onClick={() => setShowCompare(true)}>
+                <span>Compare {comparePkgs.length}</span><ArrowR size={15} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showCompare && comparePkgs.length >= 2 && (
+        <div className="pr-cmp-overlay" role="dialog" aria-modal="true" aria-label="Compare systems" onClick={() => setShowCompare(false)}>
+          <div className="pr-cmp" onClick={(e) => e.stopPropagation()}>
+            <div className="pr-cmp-top">
+              <h3>Compare systems</h3>
+              <button className="xp-close" onClick={() => setShowCompare(false)} aria-label="Close">✕</button>
+            </div>
+            <div className="pr-cmp-scroll">
+              <table className="pr-cmp-table">
+                <thead>
+                  <tr>
+                    <th />
+                    {comparePkgs.map((p) => <th key={p.id}>{p.name}{p.badge && <span className="pr-cmp-badge">{p.badge}</span>}</th>)}
+                  </tr>
+                </thead>
+                <tbody>
+                  {([
+                    ["Financing from", (p: Package) => `${fmtN(monthlyFrom(p.priceFrom))}/mo`],
+                    ["Est. turnkey", (p: Package) => fmtN(p.priceFrom)],
+                    ["Rating", (p: Package) => `★ ${p.rating.toFixed(1)} (${p.reviews})`],
+                    ["Battery type", (p: Package) => p.chem],
+                    ["Inverter", (p: Package) => `${p.kva} kVA`],
+                    ["Storage", (p: Package) => `${p.kwh} kWh`],
+                    ["Battery", (p: Package) => p.battery],
+                    ["Backup", (p: Package) => p.backup],
+                    ["Panels", (p: Package) => p.panels],
+                    ["Warranty", (p: Package) => p.warranty],
+                    ["Best for", (p: Package) => p.fit],
+                    ["Availability", (p: Package) => p.stock],
+                  ] as [string, (p: Package) => string][]).map(([label, fn]) => (
+                    <tr key={label}>
+                      <td className="pr-cmp-lbl">{label}</td>
+                      {comparePkgs.map((p) => <td key={p.id}>{fn(p)}</td>)}
+                    </tr>
+                  ))}
+                  <tr>
+                    <td className="pr-cmp-lbl" />
+                    {comparePkgs.map((p) => (
+                      <td key={p.id}><button className="btn btn--primary btn--sm" onClick={() => { setShowCompare(false); setQuotePkg(p); }}><span>Get a Quote</span></button></td>
+                    ))}
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
 
       {quotePkg && <QuotePanel pkg={quotePkg} onClose={() => setQuotePkg(null)} />}
     </main>

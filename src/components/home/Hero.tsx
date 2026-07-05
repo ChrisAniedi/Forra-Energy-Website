@@ -3,7 +3,6 @@
 import CommandCenter from "@/components/home/CommandCenter";
 import { TickIc } from "@/components/ui/icons";
 import { Btn } from "@/components/ui/Button";
-import { Eyebrow } from "@/components/ui/Eyebrow";
 import { CountUp } from "@/components/ui/CountUp";
 import { useOverlay } from "@/context/OverlayProvider";
 
@@ -18,7 +17,15 @@ const Hero = () => {
       </div>
       <div className="container">
         <div className="hero-center">
-          <Eyebrow>Africa's Intelligent Energy Platform</Eyebrow>
+          <div className="hero-proof">
+            <div className="hero-avatars" aria-hidden="true">
+              {["a", "b", "c", "d"].map((k) => <span key={k} className={"hero-av hero-av--" + k} />)}
+            </div>
+            <div className="hero-proof-txt">
+              <span className="hero-stars" aria-hidden="true">★★★★★</span>
+              <span>Trusted by <strong>1,500+</strong> Nigerian homes &amp; businesses</span>
+            </div>
+          </div>
           <h1>Powering a smarter, more reliable and sustainable future<span className="gold">.</span></h1>
           <p className="hero-sub">
             Forra Energy helps homes and businesses reduce electricity costs, improve energy

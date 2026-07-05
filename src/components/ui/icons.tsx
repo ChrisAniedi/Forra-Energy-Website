@@ -53,6 +53,8 @@ export const MailIc: IconType = (p) => (<I {...p}><rect x="3" y="5" width="18" h
 export const PinIc: IconType = (p) => (<I {...p}><path d="M12 21s7-5.3 7-11a7 7 0 1 0-14 0c0 5.7 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></I>);
 export const ChevD: IconType = (p) => (<I {...p}><path d="m6 9.5 6 5.5 6-5.5"/></I>);
 export const StarIc: IconType = (p) => (<I {...p}><path d="m12 3.2 2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8L12 3.2Z"/></I>);
+export const HeartIc: IconType = (p) => (<I {...p}><path d="M12 20s-7-4.4-9.2-8.5C1.4 8.3 2.8 4.7 6.3 4.7c2 0 3.2 1.2 4 2.4.8-1.2 2-2.4 4-2.4 3.5 0 4.9 3.6 3.5 6.8C19 15.6 12 20 12 20Z"/></I>);
+export const ScaleIc: IconType = (p) => (<I {...p}><path d="M12 3v18M6 7h12M6 7 3.5 13.5h5L6 7Zm12 0-2.5 6.5h5L18 7ZM4 21h16"/><path d="M3.5 13.5a2.5 2.5 0 0 0 5 0M15.5 13.5a2.5 2.5 0 0 0 5 0" strokeWidth="1.3"/></I>);
 export const TimerIc: IconType = (p) => (<I {...p}><circle cx="12" cy="13" r="8"/><path d="M12 9.5V13l2.5 2.5M9.5 2.5h5"/></I>);
 export const HealthIc: IconType = (p) => (<I {...p}><path d="M12 20.5S3.5 15.4 3.5 9.3A4.6 4.6 0 0 1 12 6.9a4.6 4.6 0 0 1 8.5 2.4c0 6.1-8.5 11.2-8.5 11.2Z"/><path d="M7.5 12h2.6l1.2-2.4 1.6 4 1.2-1.6h2.4"/></I>);
 export const SchoolIc: IconType = (p) => (<I {...p}><path d="m2.8 9 9.2-4.7L21.2 9 12 13.7 2.8 9Z"/><path d="M6.3 11v4.6c0 1.5 2.6 2.9 5.7 2.9s5.7-1.4 5.7-2.9V11M21.2 9v5.5"/></I>);
