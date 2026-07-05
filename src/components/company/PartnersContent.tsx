@@ -6,10 +6,9 @@ import { Btn } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { useOverlay } from "@/context/OverlayProvider";
 
-const PARTNER_GROUPS: { label: string; items: string[] }[] = [
-  { label: "Financing", items: ["Sterling Bank", "Bank of Industry", "REA Nigeria", "Nexus"] },
-  { label: "Equipment", items: ["Huawei FusionSolar", "Deye", "Jinko Solar", "Felicity Solar", "Sumry", "Luxwat"] },
-  { label: "Certification", items: ["NEMSA Certified", "SON Approved", "COREN Engineers"] },
+const PARTNERS = [
+  "Sterling Bank", "Bank of Industry", "REA Nigeria", "Nexus", "Huawei FusionSolar", "Deye",
+  "Jinko Solar", "Felicity Solar", "Sumry", "Luxwat", "Itel", "NEMSA Certified", "SON Approved", "COREN Engineers",
 ];
 
 const TYPES: { label: string; blurb: string }[] = [
@@ -54,15 +53,8 @@ const PartnersContent = () => {
       <section className="section section--tight">
         <div className="container">
           <p className="partners-label">Financing, equipment &amp; certification partners</p>
-          <div className="partner-cats">
-            {PARTNER_GROUPS.map((g) => (
-              <div className="partner-cat" key={g.label}>
-                <span className="partner-cat-label">{g.label}</span>
-                <div className="partners-row">
-                  {g.items.map((p) => <span key={p} className="partner-chip">{p}</span>)}
-                </div>
-              </div>
-            ))}
+          <div className="partners-row">
+            {PARTNERS.map((p) => <span key={p} className="partner-chip">{p}</span>)}
           </div>
         </div>
       </section>

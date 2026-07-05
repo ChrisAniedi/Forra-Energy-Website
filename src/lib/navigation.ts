@@ -32,4 +32,12 @@ export const NAV_ROUTES: Record<string, string> = {
   Careers: "/careers",
   Contact: "/contact",
   "Client Portal": "/portal",
+  "Knowledge Center": "/knowledge-center",
+  Blog: "/blog",
+  "Solar Learning Hub": "/learning",
+  "Energy Guides": "/guides",
+  "Savings Calculator": "/savings-calculator",
+  "Case Studies": "/case-studies",
+  FAQs: "/faqs",
+  Support: "/support",
 };
