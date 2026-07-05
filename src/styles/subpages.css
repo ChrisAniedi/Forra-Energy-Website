@@ -1,0 +1,50 @@
+/* Financing + Residential sub-pages — shared bits not covered by home/pages CSS. */
+
+/* financing plan tag */
+.plan-tag{display:inline-block;margin-left:8px;font-family:var(--body);font-size:9.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--emerald-d);background:var(--mint);padding:3px 8px;border-radius:999px;vertical-align:middle}
+.fin-cta-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
+
+/* checklist */
+.check-list{list-style:none;display:flex;flex-direction:column;gap:12px;align-self:start;background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:22px 24px;box-shadow:var(--shadow)}
+.check-list li{display:flex;align-items:center;gap:12px;font-size:14.5px;font-weight:600;color:var(--ink);padding-bottom:12px;border-bottom:1px dashed var(--line)}
+.check-list li:last-child{padding-bottom:0;border-bottom:0}
+.check-ic{flex-shrink:0;display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:var(--mint)}
+
+/* faq */
+.faq{max-width:820px;display:flex;flex-direction:column;gap:10px}
+.faq-item{border:1px solid var(--line);border-radius:var(--r-md);background:#fff;overflow:hidden}
+.faq-item summary{display:flex;justify-content:space-between;align-items:center;gap:16px;cursor:pointer;padding:18px 20px;font-family:var(--disp);font-weight:600;font-size:16px;color:var(--forest);list-style:none}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-mark{position:relative;flex-shrink:0;width:16px;height:16px}
+.faq-mark::before,.faq-mark::after{content:'';position:absolute;background:var(--emerald-d);border-radius:2px;transition:transform .2s ease}
+.faq-mark::before{top:7px;left:0;width:16px;height:2px}
+.faq-mark::after{top:0;left:7px;width:2px;height:16px}
+.faq-item[open] .faq-mark::after{transform:rotate(90deg);opacity:0}
+.faq-item p{padding:0 20px 20px;color:var(--sub);font-size:14.5px;line-height:1.6;max-width:680px}
+
+/* residential — recommended home systems */
+.res-sys{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.res-sys-card{display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:22px;transition:transform .2s,box-shadow .2s,border-color .2s}
+.res-sys-card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:var(--emerald)}
+.res-sys-top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.res-sys-ic{flex-shrink:0;display:grid;place-items:center;width:40px;height:40px;border-radius:11px;background:var(--mint)}
+.res-sys-top h3{font-size:18px}
+.res-sys-top span{font-size:12px;font-weight:700;color:var(--emerald-d)}
+.res-sys-fit{font-size:13.5px;font-weight:600;color:var(--ink);margin-bottom:6px}
+.res-sys-powers{font-size:13px;color:var(--sub);margin-bottom:18px;flex:1}
+.res-sys-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;border-top:1px dashed var(--line);padding-top:14px}
+.res-sys-foot label{display:block;font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:2px}
+.res-sys-foot strong{font-family:var(--disp);font-size:18px;font-weight:600;color:var(--forest)}
+.res-sys-foot strong em{font-style:normal;font-size:11px;font-weight:600;color:var(--sub)}
+.res-hero-actions{margin-top:26px}
+
+/* residential quote */
+.res-quote{max-width:780px;margin:0 auto;text-align:center}
+.res-quote p{font-family:var(--disp);font-weight:500;font-size:clamp(20px,2.4vw,27px);line-height:1.4;color:var(--forest);text-wrap:balance}
+.res-quote footer{display:inline-flex;align-items:center;gap:12px;margin-top:24px}
+.res-quote-av{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--forest);color:#fff;font-weight:700;font-size:14px}
+.res-quote footer span:last-child{text-align:left}
+.res-quote footer strong{display:block;font-size:14.5px;color:var(--ink)}
+.res-quote footer em{font-style:normal;font-size:13px;color:var(--sub)}
+
+@media (max-width:900px){.res-sys{grid-template-columns:1fr}}

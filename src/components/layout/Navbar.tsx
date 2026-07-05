@@ -11,8 +11,8 @@ const DropItem = ({ item }: { item: string }) => {
   const route = NAV_ROUTES[item];
   if (route) return <Link href={route}>{item}</Link>;
   return (
-    <a href="#" aria-disabled onClick={(e: MouseEvent) => e.preventDefault()}>
-      {item}
+    <a className="nav-drop-soon" href="#" aria-disabled="true" tabIndex={-1} onClick={(e: MouseEvent) => e.preventDefault()}>
+      {item}<span className="nav-soon">Soon</span>
     </a>
   );
 };

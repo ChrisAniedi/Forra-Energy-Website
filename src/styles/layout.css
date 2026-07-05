@@ -27,6 +27,9 @@ a.topbar-portal:hover{color:#FFBC33}
 .nav-item:hover .nav-drop,.nav-item:focus-within .nav-drop{opacity:1;visibility:visible;transform:translateY(0)}
 .nav-drop a{padding:9px 12px;border-radius:9px;font-size:14px;color:var(--sub)}
 .nav-drop a:hover{background:var(--mint);color:var(--emerald-d)}
+.nav-drop a.nav-drop-soon{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#AEBBB2;cursor:not-allowed}
+.nav-drop a.nav-drop-soon:hover{background:transparent;color:#AEBBB2}
+.nav-soon{font-size:9.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#A9B6AD;background:var(--mist);border:1px solid var(--line);padding:2px 7px;border-radius:999px}
 .nav-cta{display:flex;align-items:center;gap:6px}
 
 

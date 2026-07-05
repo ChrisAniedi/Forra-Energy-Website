@@ -12,6 +12,7 @@ import "@/styles/pages.css";
 import "@/styles/overlays.css";
 import "@/styles/shop.css";
 import "@/styles/audit.css";
+import "@/styles/subpages.css";
 import "@/styles/responsive.css";
 
 export const metadata: Metadata = {
