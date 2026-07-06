@@ -15,6 +15,8 @@ a.topbar-portal:hover{color:#FFBC33}
 .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:24px}
 .logo{display:flex;align-items:center;gap:10px}
 .logo-mark{width:32px;height:32px;display:grid;place-items:center;flex-shrink:0}
+.logo-img{height:34px;width:auto;max-width:none;display:block}
+.foot .logo-img{height:38px}
 .logo-word{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:-.01em}
 .logo-word em{font-style:normal;color:var(--emerald-d);font-weight:500}
 .logo--light .logo-word{color:#fff}
