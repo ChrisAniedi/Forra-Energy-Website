@@ -7,7 +7,9 @@ body {
   -webkit-font-smoothing: antialiased;
   line-height: 1.55;
   font-size: 16px;
+  overflow-x: clip; /* guard against stray horizontal overflow on mobile (no effect on sticky) */
 }
+img { max-width: 100%; }
 
 button{font-family:inherit;cursor:pointer;border:none;background:none}
 input{font-family:inherit}
