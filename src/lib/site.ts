@@ -15,5 +15,5 @@ export const SITE = {
     address: "Lekki Phase 1, Lagos",
   },
   coverage: "Installing in 12+ states",
-  rc: "RC 1847263",
+  rc: "RC 1998360",
 } as const;

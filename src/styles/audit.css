@@ -64,6 +64,9 @@
 .aud-load-info strong{display:block;font-size:13.5px;font-weight:600;color:var(--ink)}
 .aud-load-info span{font-size:11.5px;color:var(--sub);font-weight:600;display:flex;align-items:center;gap:4px}
 .aud-hrs{width:42px;border:1px solid var(--line);border-radius:6px;padding:2px 4px;font:inherit;font-size:11.5px;font-weight:700;color:var(--ink);text-align:center;background:var(--mist)}
+.aud-hrs:focus{outline:none;border-color:var(--emerald);background:#fff}
+.aud-w{width:52px}
+.aud-load-tip{font-size:11.5px;color:var(--sub);margin:-2px 0 10px}
 .aud-stepper{display:flex;align-items:center;gap:2px;background:var(--mist);border-radius:999px;padding:3px}
 .aud-stepper button{width:24px;height:24px;border-radius:50%;background:#fff;border:1px solid var(--line);font-size:15px;font-weight:700;color:var(--forest);display:grid;place-items:center}
 .aud-stepper button:hover{border-color:var(--emerald);color:var(--emerald-d)}
@@ -114,8 +117,26 @@
 .aud-save strong.good{color:#5FD6A0}
 .aud-actions{display:flex;flex-direction:column;gap:9px}
 .aud-actions .btn{width:100%;justify-content:center}
-.aud-actions .btn--outline{border-color:rgba(255,255,255,.28);color:#fff}
-.aud-actions .btn--outline:hover{background:rgba(255,255,255,.08)}
+.aud-actions .btn--outline{border-color:rgba(255,255,255,.28);color:#fff;background:transparent}
+.aud-actions .btn--outline:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.45)}
+.aud-download{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px;font-size:12.5px;font-weight:700;color:#C7DBD0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:999px;transition:all .15s}
+.aud-download:hover{background:rgba(255,255,255,.13);color:#fff}
+.aud-download:disabled{opacity:.6;cursor:default}
+.aud-download svg{color:#5FD6A0;flex-shrink:0}
+.aud-note{background:rgba(242,169,28,.14);border:1px solid rgba(242,169,28,.32);border-radius:var(--r-sm);padding:11px 13px;margin-bottom:16px;font-size:12px;line-height:1.55;color:#F1DDAE}
+.aud-note strong{color:var(--gold);font-weight:800}
+.aud-note b{color:#fff;font-weight:700}
+.aud-spec-sub{display:block;font-style:normal;font-size:10px;color:#8FB9A6;font-weight:600;margin-top:2px}
+
+/* download dialog */
+.aud-dlg{position:fixed;inset:0;z-index:120;background:rgba(7,33,23,.55);backdrop-filter:blur(4px);display:grid;place-items:center;padding:20px;animation:fadeIn .2s ease}
+.aud-dlg-card{position:relative;background:#fff;border-radius:var(--r-lg);padding:30px;width:min(420px,100%);box-shadow:0 40px 90px -30px rgba(7,33,23,.6);text-align:center}
+.aud-dlg-ic{display:inline-grid;place-items:center;width:52px;height:52px;border-radius:15px;background:var(--mint);margin-bottom:14px}
+.aud-dlg-card h3{font-family:var(--disp);font-weight:600;font-size:20px}
+.aud-dlg-card>p{color:var(--sub);font-size:13.5px;margin:8px 0 18px}
+.aud-dlg-card .f-field{text-align:left;margin-bottom:12px}
+.aud-dlg-go{width:100%;justify-content:center;margin-top:6px}
+.aud-dlg-note{font-size:11px;color:var(--sub);margin-top:12px}
 .aud-disclaimer{font-size:11px;color:#8FB9A6;line-height:1.5;margin-top:14px;text-align:center}
 
 @media (max-width:1000px){

@@ -5,6 +5,7 @@ import { useState } from "react";
 import type { Package } from "@/components/shop/packages";
 import { Btn } from "@/components/ui/Button";
 import { useEscapeKey, useScrollLock } from "@/lib/hooks";
+import { submitLead } from "@/lib/leads";
 import { BatteryIc, DocIc, FlashIc, ShieldIc, SunIc, TickIc, TimerIc } from "@/components/ui/icons";
 
 const QuotePanel = ({ pkg, onClose }: { pkg: Package; onClose: () => void }) => {
@@ -17,6 +18,11 @@ const QuotePanel = ({ pkg, onClose }: { pkg: Package; onClose: () => void }) => 
   const [pay, setPay] = useState("Financing");
   const [done, setDone] = useState(false);
   const valid = Boolean(name.trim() && phone.trim().length >= 7);
+  const submit = () => {
+    if (!valid) return;
+    submitLead({ source: "Quote request", name: name.trim(), phone: phone.trim(), details: `${pkg.name} · ${state} · ${timeline} · ${pay}` });
+    setDone(true);
+  };
   return (
     <div className="xp-root" role="dialog" aria-modal="true" aria-label="Get a quote">
       <div className="xp-backdrop" onClick={onClose} />
@@ -65,7 +71,7 @@ const QuotePanel = ({ pkg, onClose }: { pkg: Package; onClose: () => void }) => 
                 ))}
               </div>
             </div>
-            <Btn onClick={() => valid && setDone(true)}>Get my quote</Btn>
+            <Btn onClick={submit}>Get my quote</Btn>
             <p className="xp-note"><ShieldIc size={14} /> Free site survey. No obligation, no pressure.</p>
           </div>
         ) : (

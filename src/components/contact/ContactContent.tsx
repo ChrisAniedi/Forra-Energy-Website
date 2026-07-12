@@ -6,6 +6,7 @@ import { ArrowR, MailIc, PhoneIc, PinIc, SettingIc, ShieldIc, TickIc, TimerIc, W
 import { Btn } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { useOverlay } from "@/context/OverlayProvider";
+import { submitLead } from "@/lib/leads";
 import { SITE } from "@/lib/site";
 
 interface Office {
@@ -67,7 +68,7 @@ const ContactContent = () => {
                 </div>
                 <label className="f-field"><span>Message</span>
                   <textarea rows={5} value={form.msg} onChange={set("msg")} placeholder="Tell us about your property, current power costs, or what you'd like to achieve…" /></label>
-                <Btn onClick={() => valid && setSent(true)}>Send message</Btn>
+                <Btn onClick={() => { if (!valid) return; submitLead({ source: "Contact form", name: form.name.trim(), email: form.email.trim(), phone: form.phone.trim(), message: form.msg.trim(), details: `${form.who} · ${form.subject}` }); setSent(true); }}>Send message</Btn>
                 {!valid && <p className="f-hint">Name, a valid email and phone number are required.</p>}
               </div>
             ) : (

@@ -5,6 +5,7 @@ import { useEscapeKey, useScrollLock } from "@/lib/hooks";
 import { useState } from "react";
 import { MonitorIc, PhoneIc, ShieldIc, TickIc, WaIc, type IconType } from "@/components/ui/icons";
 import { Btn } from "@/components/ui/Button";
+import { submitLead } from "@/lib/leads";
 import type { OverlayPrefill } from "@/context/OverlayProvider";
 
 const ExpertPanel = ({ onClose, prefill }: { onClose: () => void; prefill?: OverlayPrefill | null }) => {
@@ -64,7 +65,7 @@ const ExpertPanel = ({ onClose, prefill }: { onClose: () => void; prefill?: Over
               <label className="f-field"><span>Phone / WhatsApp</span>
                 <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+234 800 000 0000" /></label>
             </div>
-            <Btn onClick={() => valid && setDone(true)}>Book consultation</Btn>
+            <Btn onClick={() => { if (!valid) return; submitLead({ source: "Expert consultation", name: name.trim(), phone: phone.trim(), details: `${topic} · via ${channel} · ${slot}${prefill?.summary ? ` · ${prefill.summary}` : ""}` }); setDone(true); }}>Book consultation</Btn>
             <p className="xp-note"><ShieldIc size={14} /> You'll speak with an engineer, not a salesperson. No obligation.</p>
           </div>
         ) : (

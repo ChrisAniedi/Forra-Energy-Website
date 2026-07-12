@@ -124,7 +124,19 @@ const STD_KVA = [1.5, 2.5, 3.5, 5, 7.5, 10, 15, 20, 30, 40, 50];
 const FIN_MARKUP = 1.2; // illustrative financing markup across the term
 
 const ceilTo = (v: number, step: number) => Math.ceil(v / step) * step;
+const floorTo = (v: number, step: number) => Math.floor(v / step) * step;
 const roundKva = (v: number) => STD_KVA.find((k) => k >= v) ?? ceilTo(v, 10);
+
+/** Battery-bank module sizes for chemistries built from discrete batteries (not Lithium). */
+export const BANKS: Partial<Record<ChemKey, { ah: number; unitKwh: number }>> = {
+  Tubular: { ah: 220, unitKwh: 1.05 },
+  GEL: { ah: 200, unitKwh: 0.95 },
+};
+/** e.g. "4 × 220Ah" — how many batteries make up a nominal kWh. Null for Lithium (integrated). */
+export const batteryBank = (chem: ChemKey, kwh: number): string | null => {
+  const b = BANKS[chem];
+  return b && kwh > 0 ? `${Math.max(1, Math.round(kwh / b.unitKwh))} × ${b.ah}Ah` : null;
+};
 
 export interface AuditResult {
   dailyKwh: number;
@@ -135,7 +147,10 @@ export interface AuditResult {
   arrayKw: number;
   dailyGen: number;
   backupHours: number;
+  backupAchieved: number; // hours the (possibly budget-reduced) battery actually delivers
   total: number;
+  bestTotal: number; // unconstrained best-fit cost
+  constrained: boolean; // true when sized down to fit a budget
   costLow: number;
   costHigh: number;
   monthlySavings: number;
@@ -152,10 +167,11 @@ export interface AuditInput {
   backupHours: number;
   sunHours: number;
   currentSpend: number; // monthly ₦ (bill + fuel)
+  budget?: number; // optional system budget ₦; sizes the best system within it
 }
 
 export function calcAudit(inp: AuditInput): AuditResult {
-  const { load, chem, system, backupHours, sunHours, currentSpend } = inp;
+  const { load, chem, system, backupHours, sunHours, currentSpend, budget } = inp;
   const dailyWh = load.reduce((s, a) => s + a.watts * a.qty * a.hours, 0);
   const dailyKwh = dailyWh / 1000;
   const connectedW = load.reduce((s, a) => s + a.watts * a.qty, 0);
@@ -163,32 +179,47 @@ export function calcAudit(inp: AuditInput): AuditResult {
 
   const empty = load.length === 0 || dailyKwh === 0;
   const inverterKva = empty ? 0 : roundKva(peakKw / 0.8);
+  const dod = CHEMS[chem].dod;
 
-  // size battery + panels against a design load that includes a reserve for unforeseen use
+  // best-fit sizing against a design load that includes a reserve for unforeseen use
   const designKwh = dailyKwh * (1 + RESERVE);
-  const usableKwh = designKwh * (backupHours / 24);
-  const batteryKwh = system === "On-grid" || empty ? 0 : ceilTo(usableKwh / CHEMS[chem].dod, 0.5);
-
   const derate = system === "Off-grid" ? 0.72 : 0.8;
-  const panelKw = empty ? 0 : designKwh / (sunHours * derate);
-  const panelCount = empty ? 0 : Math.max(2, Math.ceil((panelKw * 1000) / PRICE.panelW));
+  let batteryKwh = system === "On-grid" || empty ? 0 : ceilTo((designKwh * (backupHours / 24)) / dod, 0.5);
+  let panelCount = empty ? 0 : Math.max(2, Math.ceil((designKwh / (sunHours * derate) * 1000) / PRICE.panelW));
+
+  const invCost = inverterKva * PRICE.perKva;
+  const totalFor = (batt: number, pan: number) =>
+    empty ? 0 : Math.round((invCost + batt * CHEMS[chem].perKwh + pan * PRICE.panel) * (1 + PRICE.installPct));
+  const bestTotal = totalFor(batteryKwh, panelCount);
+
+  // budget constraint: keep the inverter (peak load), scale battery + panels to fit
+  let constrained = false;
+  if (budget && budget > 0 && !empty && budget < bestTotal) {
+    constrained = true;
+    const flex = Math.max(0, budget / (1 + PRICE.installPct) - invCost);
+    const battBest = batteryKwh * CHEMS[chem].perKwh;
+    const panBest = panelCount * PRICE.panel;
+    const denom = battBest + panBest || 1;
+    batteryKwh = system === "On-grid" ? 0 : Math.max(0, floorTo((flex * (battBest / denom)) / CHEMS[chem].perKwh, 0.5));
+    panelCount = Math.max(2, Math.floor((flex * (panBest / denom)) / PRICE.panel));
+  }
+
   const arrayKw = (panelCount * PRICE.panelW) / 1000;
   const dailyGen = +(arrayKw * sunHours * 0.75).toFixed(1);
-
-  const equip = inverterKva * PRICE.perKva + batteryKwh * CHEMS[chem].perKwh + panelCount * PRICE.panel;
-  const total = empty ? 0 : Math.round(equip * (1 + PRICE.installPct));
+  const total = totalFor(batteryKwh, panelCount);
+  const backupAchieved = batteryKwh > 0 && designKwh > 0 ? +((batteryKwh * dod * 24) / designKwh).toFixed(1) : 0;
   const costLow = Math.round((total * 0.92) / 10000) * 10000;
   const costHigh = Math.round((total * 1.08) / 10000) * 10000;
 
   const newSpend = empty ? 0 : Math.round(currentSpend * 0.12);
   const monthlySavings = empty ? 0 : Math.max(0, currentSpend - newSpend);
-  const paybackYears = monthlySavings > 0 ? +(total / (monthlySavings * 12)).toFixed(1) : 0;
+  const paybackYears = monthlySavings > 0 && total > 0 ? +(total / (monthlySavings * 12)).toFixed(1) : 0;
   const co2Tonnes = +((dailyKwh * 365 * 0.44) / 1000).toFixed(1); // ~0.44 kg CO₂ / kWh grid+diesel
 
   return {
     dailyKwh: +dailyKwh.toFixed(1), peakKw: +peakKw.toFixed(1), inverterKva, batteryKwh: +batteryKwh.toFixed(1),
-    panelCount, arrayKw: +arrayKw.toFixed(2), dailyGen, backupHours, total, costLow, costHigh,
-    monthlySavings, newSpend, paybackYears, co2Tonnes, empty,
+    panelCount, arrayKw: +arrayKw.toFixed(2), dailyGen, backupHours, backupAchieved, total, bestTotal, constrained,
+    costLow, costHigh, monthlySavings, newSpend, paybackYears, co2Tonnes, empty,
   };
 }
 

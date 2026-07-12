@@ -7,6 +7,7 @@ import { useState } from "react";
 import { ArrowR, BuildingIc, GaugeIc, HomeIc, MailIc, PhoneIc, TickIc, WaIc, WalletIc, type IconType } from "@/components/ui/icons";
 import { Logo } from "@/components/ui/Logo";
 import { Btn } from "@/components/ui/Button";
+import { submitLead } from "@/lib/leads";
 import { useOverlay, type OverlayPrefill } from "@/context/OverlayProvider";
 
 const GOALS = [
@@ -42,6 +43,17 @@ const GetStartedWizard = ({ onClose, prefill }: { onClose: () => void; prefill?:
     !!d.spend && !!d.backup,
     Boolean(d.name.trim() && d.phone.trim().length >= 7 && d.channels.length > 0),
   ][step];
+  const next = () => {
+    if (!canNext) return;
+    if (step === 3) {
+      submitLead({
+        source: "Get Started",
+        name: d.name.trim(), phone: d.phone.trim(), email: d.email.trim(),
+        details: `${d.goal} · ${d.prop} · ${d.state} · spend ${d.spend} · backup ${d.backup} · via ${d.channels.join("+")}${prefill?.summary ? ` · ${prefill.summary}` : ""}`,
+      });
+    }
+    setStep(step + 1);
+  };
   const rec = d.spend === SPENDS[0] ? "a 3.5–5kVA hybrid system" : d.spend === SPENDS[1] ? "a 5–10kVA hybrid system" : d.spend === SPENDS[2] ? "a 10–15kVA system with expanded storage" : "a commercial-grade system — our team will scope it properly";
   const titles = ["What brings you to Forra?", "Tell us about the property", "Your current power situation", "How do we reach you?"];
   return (
@@ -157,7 +169,7 @@ const GetStartedWizard = ({ onClose, prefill }: { onClose: () => void; prefill?:
         {step < 4 && (
           <div className="wiz-nav">
             {step > 0 ? <button className="btn btn--outline" onClick={() => setStep(step - 1)}><span>Back</span></button> : <span />}
-            <button className={"btn btn--primary" + (canNext ? "" : " btn--disabled")} onClick={() => canNext && setStep(step + 1)}>
+            <button className={"btn btn--primary" + (canNext ? "" : " btn--disabled")} onClick={next}>
               <span>{step === 3 ? "Submit" : "Continue"}</span><ArrowR size={17} />
             </button>
           </div>

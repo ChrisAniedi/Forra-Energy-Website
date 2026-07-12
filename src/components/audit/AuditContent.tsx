@@ -3,12 +3,14 @@
 import { useMemo, useRef, useState } from "react";
 import {
   APPLIANCES, CATEGORIES, CAT_ICON, CHEMS, FIN_TERMS, PRESETS, RESERVE, STATES, SUN_HOURS, SYSTEM_TYPES,
-  calcAudit, financingMonthly, type ChemKey, type LoadItem, type SystemType,
+  calcAudit, financingMonthly, batteryBank, type ChemKey, type LoadItem, type SystemType,
 } from "@/components/audit/appliances";
 import { fmtN } from "@/lib/format";
+import { downloadAuditReport } from "@/lib/auditReport";
+import { submitLead } from "@/lib/leads";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { useOverlay } from "@/context/OverlayProvider";
-import { ArrowR, BatteryIc, CpuIc, LeafIc, SunIc, TickIc, TimerIc, WalletIc } from "@/components/ui/icons";
+import { ArrowR, BatteryIc, CpuIc, DocIc, LeafIc, SunIc, TickIc, TimerIc, WalletIc } from "@/components/ui/icons";
 
 const BACKUPS = [6, 12, 18, 24];
 
@@ -20,12 +22,17 @@ const AuditContent = () => {
   const [backup, setBackup] = useState(12);
   const [bill, setBill] = useState(120000);
   const [fuel, setFuel] = useState(80000);
+  const [budget, setBudget] = useState(0);
   const [cat, setCat] = useState<string>(CATEGORIES[0]);
   const [load, setLoad] = useState<LoadItem[]>([]);
   const [term, setTerm] = useState(24);
   const [cName, setCName] = useState("");
   const [cWatts, setCWatts] = useState("");
   const [cHours, setCHours] = useState("");
+  const [downloading, setDownloading] = useState(false);
+  const [showDl, setShowDl] = useState(false);
+  const [dlName, setDlName] = useState("");
+  const [dlEmail, setDlEmail] = useState("");
   const customSeq = useRef(0);
 
   const sunHours = SUN_HOURS[state] ?? 5;
@@ -44,6 +51,8 @@ const AuditContent = () => {
     setLoad((prev) => prev.flatMap((p) => (p.id === id ? (p.qty + d <= 0 ? [] : [{ ...p, qty: p.qty + d }]) : [p])));
   const setHours = (id: string, h: number) =>
     setLoad((prev) => prev.map((p) => (p.id === id ? { ...p, hours: Math.max(0, Math.min(24, h)) } : p)));
+  const setWatts = (id: string, w: number) =>
+    setLoad((prev) => prev.map((p) => (p.id === id ? { ...p, watts: Math.max(0, Math.round(w) || 0) } : p)));
   const remove = (id: string) => setLoad((prev) => prev.filter((p) => p.id !== id));
   const applyPreset = (items: [string, number][]) =>
     setLoad(items.map(([id, qty]) => ({ ...APPLIANCES.find((a) => a.id === id)!, qty })));
@@ -57,14 +66,33 @@ const AuditContent = () => {
   };
 
   const res = useMemo(
-    () => calcAudit({ load, chem, system, backupHours: backup, sunHours, currentSpend: bill + fuel }),
-    [load, chem, system, backup, sunHours, bill, fuel]
+    () => calcAudit({ load, chem, system, backupHours: backup, sunHours, currentSpend: bill + fuel, budget }),
+    [load, chem, system, backup, sunHours, bill, fuel, budget]
   );
   const monthly = financingMonthly(res.total, term);
   const qtyOf = (id: string) => load.find((p) => p.id === id)?.qty ?? 0;
   const recoSummary = res.empty
     ? ""
     : `${res.inverterKva} kVA ${system}${res.batteryKwh > 0 ? ` · ${res.batteryKwh} kWh ${chem}` : ""} · est. ${fmtN(res.costLow)}–${fmtN(res.costHigh)}`;
+
+  const dlValid = dlName.trim().length > 1 && /.+@.+\..+/.test(dlEmail.trim());
+  const confirmDownload = async () => {
+    if (downloading || res.empty || !dlValid) return;
+    setDownloading(true);
+    try {
+      const dateLabel = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+      await downloadAuditReport({ state, system, chem, backup, res, monthly, term, load, bill, fuel, budget, name: dlName.trim(), email: dlEmail.trim(), dateLabel });
+      submitLead({
+        source: "Audit report",
+        name: dlName.trim(),
+        email: dlEmail.trim(),
+        details: `${recoSummary}${res.constrained ? ` · budget ${fmtN(budget)}` : ""}`,
+      });
+      setShowDl(false);
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   return (
     <main className="page">
@@ -134,7 +162,15 @@ const AuditContent = () => {
             </div>
 
             <div className="aud-card">
-              <h3 className="aud-h">3 · Your appliances</h3>
+              <h3 className="aud-h">3 · Your budget <em className="aud-opt">optional — we size the best system within it</em></h3>
+              <div className="aud-field">
+                <label htmlFor="aud-budget">Budget for the system</label>
+                <div className="aud-money"><span>₦</span><input id="aud-budget" type="number" min={0} value={budget || ""} placeholder="Leave blank for our best-fit recommendation" onChange={(e) => setBudget(+e.target.value || 0)} /></div>
+              </div>
+            </div>
+
+            <div className="aud-card">
+              <h3 className="aud-h">4 · Your appliances</h3>
               <div className="aud-presets">
                 <span>Quick start:</span>
                 {PRESETS.map((p) => (
@@ -184,12 +220,15 @@ const AuditContent = () => {
               {load.length === 0 ? (
                 <p className="aud-empty">Add appliances above, or tap a quick-start profile, to build your daily load.</p>
               ) : (
+                <>
+                <p className="aud-load-tip">Tip: tap any <b>watt</b> or <b>hour</b> value to match your own appliance — our figures are just typical estimates.</p>
                 <ul className="aud-load">
                   {load.map((p) => (
                     <li key={p.id}>
                       <div className="aud-load-info">
                         <strong>{p.name}</strong>
-                        <span>{p.watts}W ·
+                        <span>
+                          <input className="aud-hrs aud-w" type="number" min={0} value={p.watts} onChange={(e) => setWatts(p.id, +e.target.value)} />W ·
                           <input className="aud-hrs" type="number" min={0} max={24} step={0.5} value={p.hours} onChange={(e) => setHours(p.id, +e.target.value)} /> h/day
                         </span>
                       </div>
@@ -202,6 +241,7 @@ const AuditContent = () => {
                     </li>
                   ))}
                 </ul>
+                </>
               )}
             </div>
           </div>
@@ -223,14 +263,20 @@ const AuditContent = () => {
               ) : (
                 <>
                   <div className="aud-reco">
-                    <label>Recommended system</label>
+                    <label>{res.constrained ? "Recommended within budget" : "Recommended system"}</label>
                     <strong>{res.inverterKva} kVA {system}{res.batteryKwh > 0 ? ` · ${res.batteryKwh} kWh` : ""}</strong>
-                    <em>{res.batteryKwh > 0 ? CHEMS[chem].label + " · " + CHEMS[chem].life : "Grid-tied — no battery storage"}</em>
+                    <em>{res.batteryKwh > 0 ? `${CHEMS[chem].label} · ${CHEMS[chem].life}${batteryBank(chem, res.batteryKwh) ? ` · ${batteryBank(chem, res.batteryKwh)}` : ""}` : "Grid-tied — no battery storage"}</em>
                   </div>
+
+                  {res.constrained && (
+                    <div className="aud-note">
+                      <strong>Sized to your budget.</strong> This isn&apos;t the ideal system for your load — it delivers about {res.backupAchieved}h backup. The best-fit system is roughly <b>{fmtN(res.bestTotal)}</b>.
+                    </div>
+                  )}
 
                   <div className="aud-specs">
                     <div><span className="aud-spec-ic"><CpuIc size={16} color="#0A7A50" /></span><label>Inverter</label><strong>{res.inverterKva} kVA</strong></div>
-                    <div><span className="aud-spec-ic"><BatteryIc size={16} color="#B47B0B" /></span><label>Battery</label><strong>{res.batteryKwh > 0 ? res.batteryKwh + " kWh" : "—"}</strong></div>
+                    <div><span className="aud-spec-ic"><BatteryIc size={16} color="#B47B0B" /></span><label>Battery</label><strong>{res.batteryKwh > 0 ? res.batteryKwh + " kWh" : "—"}</strong>{res.batteryKwh > 0 && batteryBank(chem, res.batteryKwh) && <em className="aud-spec-sub">{batteryBank(chem, res.batteryKwh)}</em>}</div>
                     <div><span className="aud-spec-ic"><SunIc size={16} color="#0A7A50" /></span><label>Panels</label><strong>{res.panelCount} × 550W</strong></div>
                     <div><span className="aud-spec-ic"><LeafIc size={16} color="#0A7A50" /></span><label>Daily solar</label><strong>{res.dailyGen} kWh</strong></div>
                   </div>
@@ -268,8 +314,11 @@ const AuditContent = () => {
                   )}
 
                   <div className="aud-actions">
-                    <button type="button" className="btn btn--primary" onClick={() => openStart({ summary: recoSummary, intent: "quote" })}><span>Get this as a quote</span><ArrowR size={16} /></button>
+                    <button type="button" className="btn btn--gold" onClick={() => openStart({ summary: recoSummary, intent: "quote" })}><span>Get this as a quote</span><ArrowR size={16} /></button>
                     <button type="button" className="btn btn--outline" onClick={() => openExpert({ summary: recoSummary })}><span>Talk to an expert</span></button>
+                    <button type="button" className="aud-download" onClick={() => setShowDl(true)}>
+                      <DocIc size={15} /><span>Download report (PDF)</span>
+                    </button>
                   </div>
                 </>
               )}
@@ -278,6 +327,25 @@ const AuditContent = () => {
           </aside>
         </div>
       </section>
+
+      {showDl && (
+        <div className="aud-dlg" role="dialog" aria-modal="true" aria-label="Download report" onClick={() => !downloading && setShowDl(false)}>
+          <div className="aud-dlg-card" onClick={(e) => e.stopPropagation()}>
+            <button className="xp-close" onClick={() => !downloading && setShowDl(false)} aria-label="Close">✕</button>
+            <span className="aud-dlg-ic"><DocIc size={24} color="#0A7A50" /></span>
+            <h3>Download your audit report</h3>
+            <p>We&apos;ll personalise the PDF with your name. Pop in your details and it downloads right away.</p>
+            <label className="f-field"><span>Full name</span>
+              <input value={dlName} onChange={(e) => setDlName(e.target.value)} placeholder="Adaeze Okonkwo" /></label>
+            <label className="f-field"><span>Email</span>
+              <input type="email" value={dlEmail} onChange={(e) => setDlEmail(e.target.value)} placeholder="you@email.com" /></label>
+            <button type="button" className={"btn btn--primary aud-dlg-go" + (dlValid ? "" : " btn--disabled")} onClick={confirmDownload} disabled={!dlValid || downloading}>
+              <span>{downloading ? "Preparing PDF…" : "Download report"}</span><DocIc size={16} />
+            </button>
+            <p className="aud-dlg-note">We&apos;ll only use this to send your report and follow up if you ask. No spam.</p>
+          </div>
+        </div>
+      )}
     </main>
   );
 };
