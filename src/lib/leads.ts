@@ -58,17 +58,17 @@ export async function emailClientReport(o: {
       method: "POST",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify({
-        _subject: `Your Forra Energy audit${o.isQuote ? " — quote request" : ""}, ${o.name}`,
-        _template: "table",
+        _subject: `Your Forra Energy audit report, ${o.name}`,
+        _template: "box",
         _captcha: "false",
         _cc: `${LEADS_CC},${o.email}`, // team + the client both receive this
-        Name: o.name,
-        Recommended_system: o.system,
-        Your_report: o.details,
-        Next_steps: o.isQuote
-          ? "Thanks for requesting a quote. An energy expert will contact you shortly to talk through your options and schedule a free site visit. Your detailed PDF report was also downloaded to your device."
-          : "Your detailed PDF report was downloaded to your device. An energy expert will reach out to help you take the next step and, if you'd like, schedule a free site visit.",
-        Submitted: new Date().toISOString(),
+        Hi_there: `Hi ${o.name}, thank you for using the Forra Energy audit. Here's a quick summary of the system we've recommended for you — your full PDF report is on your device.`,
+        Your_recommended_system: o.system,
+        The_details: o.details,
+        What_happens_next: o.isQuote
+          ? "One of our energy experts will reach out to you shortly to talk through your options and arrange a free site visit at a time that suits you — no obligation at all."
+          : "An energy expert will follow up to help you take the next step and, whenever you're ready, arrange a free site visit — no obligation at all.",
+        Warm_regards: "The Forra Energy team · hello@forra.energy · +234 903 526 6832 · www.forra.energy",
       }),
     });
   } catch {
