@@ -69,7 +69,7 @@ const FREQ = {
 } as const;
 type FreqKey = keyof typeof FREQ;
 const plural = (u: string, n: number) => `${u}${n === 1 ? "" : "s"}`;
-const QUICK = [12, 24, 36, 48]; // quick-pick payment counts
+const QUICK = [3, 6, 9, 12, 24, 36, 48]; // quick-pick payment counts
 
 type SchedRow = { m: number; opening: number; principal: number; interest: number; payment: number; closing: number };
 
