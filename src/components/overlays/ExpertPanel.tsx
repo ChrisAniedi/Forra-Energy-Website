@@ -15,10 +15,11 @@ const ExpertPanel = ({ onClose, prefill }: { onClose: () => void; prefill?: Over
   const [slot, setSlot] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [done, setDone] = useState(false);
   useEscapeKey(onClose);
   const slots = ["Today · 2–4 PM", "Today · 4–6 PM", "Tomorrow · 10–12 AM", "Tomorrow · 2–4 PM", "Pick another time"];
-  const valid = Boolean(name.trim() && phone.trim().length >= 7 && slot);
+  const valid = Boolean(name.trim() && phone.trim().length >= 7 && /.+@.+\..+/.test(email.trim()) && slot);
   return (
     <div className="xp-root" role="dialog" aria-modal="true" aria-label="Talk to an expert">
       <div className="xp-backdrop" onClick={onClose} />
@@ -65,7 +66,9 @@ const ExpertPanel = ({ onClose, prefill }: { onClose: () => void; prefill?: Over
               <label className="f-field"><span>Phone / WhatsApp</span>
                 <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+234 800 000 0000" /></label>
             </div>
-            <Btn onClick={() => { if (!valid) return; submitLead({ source: "Expert consultation", name: name.trim(), phone: phone.trim(), details: `${topic} · via ${channel} · ${slot}${prefill?.summary ? ` · ${prefill.summary}` : ""}` }); setDone(true); }}>Book consultation</Btn>
+            <label className="f-field"><span>Email</span>
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@email.com" /></label>
+            <Btn onClick={() => { if (!valid) return; submitLead({ source: "Expert consultation", name: name.trim(), phone: phone.trim(), email: email.trim(), details: `${topic} · via ${channel} · ${slot}${prefill?.summary ? ` · ${prefill.summary}` : ""}` }); setDone(true); }}>Book consultation</Btn>
             <p className="xp-note"><ShieldIc size={14} /> You'll speak with an engineer, not a salesperson. No obligation.</p>
           </div>
         ) : (

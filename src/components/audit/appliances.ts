@@ -103,9 +103,9 @@ export const STATES = [
 ];
 
 export const CHEMS = {
-  Lithium: { key: "Lithium", label: "Lithium (LiFePO₄)", dod: 0.9, perKwh: 120000, life: "10+ yr lifespan" },
-  Tubular: { key: "Tubular", label: "Tubular", dod: 0.5, perKwh: 75000, life: "2–4 yr lifespan" },
-  GEL: { key: "GEL", label: "GEL", dod: 0.5, perKwh: 95000, life: "3–5 yr lifespan" },
+  Lithium: { key: "Lithium", label: "Lithium (LiFePO₄)", dod: 0.9, perKwh: 126000, life: "10+ yr lifespan" },
+  Tubular: { key: "Tubular", label: "Tubular", dod: 0.5, perKwh: 78000, life: "2–4 yr lifespan" },
+  GEL: { key: "GEL", label: "GEL", dod: 0.5, perKwh: 100000, life: "3–5 yr lifespan" },
 } as const;
 export type ChemKey = keyof typeof CHEMS;
 
@@ -116,12 +116,12 @@ export const SYSTEM_TYPES = [
 ] as const;
 export type SystemType = (typeof SYSTEM_TYPES)[number]["key"];
 
-/* --- pricing constants — clearly-marked ESTIMATES, refined at survey --- */
-const PRICE = { perKva: 90000, panel: 100000, panelW: 550, installPct: 0.16 };
+/* --- pricing constants — neutral/competitive estimates, confirmed at a free site survey --- */
+const PRICE = { perKva: 94000, panel: 104000, panelW: 550, installPct: 0.16 };
+const FIN_MARKUP = 1.2; // illustrative financing markup spread across the term
 /** Design reserve added to daily energy — headroom for unforeseen/occasional loads. */
 export const RESERVE = 0.1;
 const STD_KVA = [1.5, 2.5, 3.5, 5, 7.5, 10, 15, 20, 30, 40, 50];
-const FIN_MARKUP = 1.2; // illustrative financing markup across the term
 
 const ceilTo = (v: number, step: number) => Math.ceil(v / step) * step;
 const floorTo = (v: number, step: number) => Math.floor(v / step) * step;
@@ -132,10 +132,14 @@ export const BANKS: Partial<Record<ChemKey, { ah: number; unitKwh: number }>> = 
   Tubular: { ah: 220, unitKwh: 1.05 },
   GEL: { ah: 200, unitKwh: 0.95 },
 };
-/** e.g. "4 × 220Ah" — how many batteries make up a nominal kWh. Null for Lithium (integrated). */
+/** e.g. "4 × 220Ah" — battery count for the recommended bank. Null for Lithium.
+ *  `kwh` is nominal capacity; batteries are counted on the energy they actually deliver
+ *  (nominal × depth-of-discharge ÷ usable-per-battery) so the count reflects a real bank. */
 export const batteryBank = (chem: ChemKey, kwh: number): string | null => {
   const b = BANKS[chem];
-  return b && kwh > 0 ? `${Math.max(1, Math.round(kwh / b.unitKwh))} × ${b.ah}Ah` : null;
+  if (!b || kwh <= 0) return null;
+  const usable = kwh * CHEMS[chem].dod;
+  return `${Math.max(1, Math.round(usable / b.unitKwh))} × ${b.ah}Ah`;
 };
 
 export interface AuditResult {
@@ -181,7 +185,7 @@ export function calcAudit(inp: AuditInput): AuditResult {
   const inverterKva = empty ? 0 : roundKva(peakKw / 0.8);
   const dod = CHEMS[chem].dod;
 
-  // best-fit sizing against a design load that includes a reserve for unforeseen use
+  // size battery + panels against a design load that includes a reserve for unforeseen use
   const designKwh = dailyKwh * (1 + RESERVE);
   const derate = system === "Off-grid" ? 0.72 : 0.8;
   let batteryKwh = system === "On-grid" || empty ? 0 : ceilTo((designKwh * (backupHours / 24)) / dod, 0.5);
@@ -218,8 +222,8 @@ export function calcAudit(inp: AuditInput): AuditResult {
 
   return {
     dailyKwh: +dailyKwh.toFixed(1), peakKw: +peakKw.toFixed(1), inverterKva, batteryKwh: +batteryKwh.toFixed(1),
-    panelCount, arrayKw: +arrayKw.toFixed(2), dailyGen, backupHours, backupAchieved, total, bestTotal, constrained,
-    costLow, costHigh, monthlySavings, newSpend, paybackYears, co2Tonnes, empty,
+    panelCount, arrayKw: +arrayKw.toFixed(2), dailyGen, backupHours, backupAchieved,
+    total, bestTotal, constrained, costLow, costHigh, monthlySavings, newSpend, paybackYears, co2Tonnes, empty,
   };
 }
 

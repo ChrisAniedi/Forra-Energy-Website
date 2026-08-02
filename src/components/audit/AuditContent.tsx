@@ -7,7 +7,7 @@ import {
 } from "@/components/audit/appliances";
 import { fmtN } from "@/lib/format";
 import { downloadAuditReport } from "@/lib/auditReport";
-import { submitLead } from "@/lib/leads";
+import { submitLead, emailClientReport } from "@/lib/leads";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { useOverlay } from "@/context/OverlayProvider";
 import { ArrowR, BatteryIc, CpuIc, DocIc, LeafIc, SunIc, TickIc, TimerIc, WalletIc } from "@/components/ui/icons";
@@ -15,7 +15,7 @@ import { ArrowR, BatteryIc, CpuIc, DocIc, LeafIc, SunIc, TickIc, TimerIc, Wallet
 const BACKUPS = [6, 12, 18, 24];
 
 const AuditContent = () => {
-  const { openStart, openExpert } = useOverlay();
+  const { openExpert } = useOverlay();
   const [state, setState] = useState("Lagos");
   const [system, setSystem] = useState<SystemType>("Hybrid");
   const [chem, setChem] = useState<ChemKey>("Lithium");
@@ -31,9 +31,12 @@ const AuditContent = () => {
   const [cHours, setCHours] = useState("");
   const [downloading, setDownloading] = useState(false);
   const [showDl, setShowDl] = useState(false);
+  const [dlMode, setDlMode] = useState<"download" | "quote">("download");
+  const [dlSent, setDlSent] = useState(false);
   const [dlName, setDlName] = useState("");
   const [dlEmail, setDlEmail] = useState("");
   const customSeq = useRef(0);
+  const openDl = (mode: "download" | "quote") => { if (res.empty) return; setDlMode(mode); setDlSent(false); setShowDl(true); };
 
   const sunHours = SUN_HOURS[state] ?? 5;
   const onGrid = system === "On-grid";
@@ -76,19 +79,18 @@ const AuditContent = () => {
     : `${res.inverterKva} kVA ${system}${res.batteryKwh > 0 ? ` · ${res.batteryKwh} kWh ${chem}` : ""} · est. ${fmtN(res.costLow)}–${fmtN(res.costHigh)}`;
 
   const dlValid = dlName.trim().length > 1 && /.+@.+\..+/.test(dlEmail.trim());
-  const confirmDownload = async () => {
+  const confirmSubmit = async () => {
     if (downloading || res.empty || !dlValid) return;
     setDownloading(true);
     try {
       const dateLabel = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+      const bankStr = batteryBank(chem, res.batteryKwh);
+      const systemLabel = `${res.inverterKva} kVA ${system}${res.batteryKwh > 0 ? ` · ${res.batteryKwh} kWh ${chem}${bankStr ? ` (${bankStr})` : ""}` : ""}`;
+      const details = `${systemLabel} · ${res.panelCount} × 550W panels · est. ${fmtN(res.costLow)}–${fmtN(res.costHigh)} · from ~${fmtN(monthly)}/mo${res.monthlySavings > 0 ? ` · saves ~${fmtN(res.monthlySavings)}/mo` : ""}${res.constrained ? ` · within budget ${fmtN(budget)}` : ""}`;
       await downloadAuditReport({ state, system, chem, backup, res, monthly, term, load, bill, fuel, budget, name: dlName.trim(), email: dlEmail.trim(), dateLabel });
-      submitLead({
-        source: "Audit report",
-        name: dlName.trim(),
-        email: dlEmail.trim(),
-        details: `${recoSummary}${res.constrained ? ` · budget ${fmtN(budget)}` : ""}`,
-      });
-      setShowDl(false);
+      emailClientReport({ name: dlName.trim(), email: dlEmail.trim(), system: systemLabel, details, isQuote: dlMode === "quote" });
+      submitLead({ source: dlMode === "quote" ? "Audit quote request" : "Audit report", name: dlName.trim(), email: dlEmail.trim(), details });
+      setDlSent(true);
     } finally {
       setDownloading(false);
     }
@@ -314,9 +316,9 @@ const AuditContent = () => {
                   )}
 
                   <div className="aud-actions">
-                    <button type="button" className="btn btn--gold" onClick={() => openStart({ summary: recoSummary, intent: "quote" })}><span>Get this as a quote</span><ArrowR size={16} /></button>
+                    <button type="button" className="btn btn--gold" onClick={() => openDl("quote")}><span>Get this as a quote</span><ArrowR size={16} /></button>
                     <button type="button" className="btn btn--outline" onClick={() => openExpert({ summary: recoSummary })}><span>Talk to an expert</span></button>
-                    <button type="button" className="aud-download" onClick={() => setShowDl(true)}>
+                    <button type="button" className="aud-download" onClick={() => openDl("download")}>
                       <DocIc size={15} /><span>Download report (PDF)</span>
                     </button>
                   </div>
@@ -329,20 +331,35 @@ const AuditContent = () => {
       </section>
 
       {showDl && (
-        <div className="aud-dlg" role="dialog" aria-modal="true" aria-label="Download report" onClick={() => !downloading && setShowDl(false)}>
+        <div className="aud-dlg" role="dialog" aria-modal="true" aria-label={dlMode === "quote" ? "Get a quote" : "Download report"} onClick={() => !downloading && setShowDl(false)}>
           <div className="aud-dlg-card" onClick={(e) => e.stopPropagation()}>
             <button className="xp-close" onClick={() => !downloading && setShowDl(false)} aria-label="Close">✕</button>
-            <span className="aud-dlg-ic"><DocIc size={24} color="#0A7A50" /></span>
-            <h3>Download your audit report</h3>
-            <p>We&apos;ll personalise the PDF with your name. Pop in your details and it downloads right away.</p>
-            <label className="f-field"><span>Full name</span>
-              <input value={dlName} onChange={(e) => setDlName(e.target.value)} placeholder="Adaeze Okonkwo" /></label>
-            <label className="f-field"><span>Email</span>
-              <input type="email" value={dlEmail} onChange={(e) => setDlEmail(e.target.value)} placeholder="you@email.com" /></label>
-            <button type="button" className={"btn btn--primary aud-dlg-go" + (dlValid ? "" : " btn--disabled")} onClick={confirmDownload} disabled={!dlValid || downloading}>
-              <span>{downloading ? "Preparing PDF…" : "Download report"}</span><DocIc size={16} />
-            </button>
-            <p className="aud-dlg-note">We&apos;ll only use this to send your report and follow up if you ask. No spam.</p>
+            {dlSent ? (
+              <>
+                <span className="aud-dlg-ic"><TickIc size={26} color="#0A7A50" /></span>
+                <h3>{dlMode === "quote" ? "Request received" : "Report on its way"}</h3>
+                <p>{dlMode === "quote"
+                  ? `We've emailed your report to ${dlEmail.trim()}, and an expert will reach out shortly to talk through your options and schedule a free site visit.`
+                  : `Your PDF is downloading, and we've emailed a copy to ${dlEmail.trim()}. An expert will follow up to help with next steps.`}</p>
+                <button type="button" className="btn btn--primary aud-dlg-go" onClick={() => setShowDl(false)}><span>Done</span></button>
+              </>
+            ) : (
+              <>
+                <span className="aud-dlg-ic"><DocIc size={24} color="#0A7A50" /></span>
+                <h3>{dlMode === "quote" ? "Get your quote" : "Download your audit report"}</h3>
+                <p>{dlMode === "quote"
+                  ? "Pop in your details — we'll email your report and an expert will follow up to discuss and schedule a visit."
+                  : "We'll personalise the PDF, download it, and email you a copy."}</p>
+                <label className="f-field"><span>Full name</span>
+                  <input value={dlName} onChange={(e) => setDlName(e.target.value)} placeholder="Adaeze Okonkwo" /></label>
+                <label className="f-field"><span>Email</span>
+                  <input type="email" value={dlEmail} onChange={(e) => setDlEmail(e.target.value)} placeholder="you@email.com" /></label>
+                <button type="button" className={"btn btn--primary aud-dlg-go" + (dlValid ? "" : " btn--disabled")} onClick={confirmSubmit} disabled={!dlValid || downloading}>
+                  <span>{downloading ? "Sending…" : dlMode === "quote" ? "Send my request" : "Download report"}</span>{dlMode === "quote" ? <ArrowR size={16} /> : <DocIc size={16} />}
+                </button>
+                <p className="aud-dlg-note">We&apos;ll email your report and use this to follow up. No spam.</p>
+              </>
+            )}
           </div>
         </div>
       )}

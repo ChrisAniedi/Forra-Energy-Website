@@ -43,3 +43,35 @@ export async function submitLead(lead: Lead): Promise<void> {
     /* never block the UI on lead capture */
   }
 }
+
+/** Emails the client a copy of their audit report + next steps (CCs the client + the team). */
+export async function emailClientReport(o: {
+  name: string;
+  email: string;
+  system: string;
+  details: string;
+  isQuote: boolean;
+}): Promise<void> {
+  if (!LEADS_ENDPOINT) return;
+  try {
+    await fetch(LEADS_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({
+        _subject: `Your Forra Energy audit${o.isQuote ? " — quote request" : ""}, ${o.name}`,
+        _template: "table",
+        _captcha: "false",
+        _cc: `${LEADS_CC},${o.email}`, // team + the client both receive this
+        Name: o.name,
+        Recommended_system: o.system,
+        Your_report: o.details,
+        Next_steps: o.isQuote
+          ? "Thanks for requesting a quote. An energy expert will contact you shortly to talk through your options and schedule a free site visit. Your detailed PDF report was also downloaded to your device."
+          : "Your detailed PDF report was downloaded to your device. An energy expert will reach out to help you take the next step and, if you'd like, schedule a free site visit.",
+        Submitted: new Date().toISOString(),
+      }),
+    });
+  } catch {
+    /* fire-and-forget */
+  }
+}
