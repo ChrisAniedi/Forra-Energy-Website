@@ -177,6 +177,37 @@
 .fin-sched .pri{color:var(--emerald-d)}
 .fin-sched-cap{font-size:11.5px;color:var(--sub);padding:10px 12px 0;line-height:1.5}
 
+/* financing calculator — restructured layout */
+.fin-intro-lead{max-width:660px;margin:14px auto 0;color:var(--sub);font-size:15px;line-height:1.6}
+.fin-calc--wide{margin-top:30px;padding:34px 38px}
+.fin-grid2{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:start;margin-bottom:4px}
+.fin-col{display:flex;flex-direction:column;gap:18px}
+.fin-lbl{display:block;font-size:13px;font-weight:600;color:var(--sub);margin-bottom:8px}
+.fin-field-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
+.fin-field-head .fin-lbl{margin-bottom:0}
+.fin-num-wrap{position:relative;display:flex;align-items:center}
+.fin-num-cur{position:absolute;left:14px;color:var(--sub);font-family:var(--disp);font-weight:600;font-size:16px;pointer-events:none}
+.fin-num{width:100%;background:var(--mist);border:1.5px solid var(--line);border-radius:var(--r-sm);padding:12px 14px 12px 30px;font-family:var(--disp);font-weight:600;font-size:18px;color:var(--ink)}
+.fin-num:focus{outline:none;border-color:var(--emerald)}
+.fin-price-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.fin-price-chips button{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:6px 11px;font-size:11.5px;font-weight:600;color:var(--sub);transition:all .15s}
+.fin-price-chips button.on{border-color:var(--emerald);background:var(--mint);color:var(--emerald-d)}
+.fin-mini{display:inline-flex;background:var(--mist);border:1px solid var(--line);border-radius:999px;padding:3px;gap:3px}
+.fin-mini button{border:none;background:transparent;color:var(--sub);font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px;cursor:pointer}
+.fin-mini button.on{background:var(--forest);color:#fff}
+.fin-minmax{display:flex;justify-content:space-between;font-size:11px;color:var(--sub);margin-top:6px}
+.fin-hint{font-size:11.5px;color:var(--sub);margin-top:8px;line-height:1.5}
+.fin-hint--warn{color:var(--gold-d)}
+.fin-tenor-btns{display:flex;gap:8px;flex-wrap:wrap}
+.fin-tenor-btns button{flex:1 1 0;min-width:60px;border:1.5px solid var(--line);border-radius:999px;padding:9px 6px;font-size:13px;font-weight:700;color:var(--sub);background:#fff}
+.fin-tenor-btns button.on{background:var(--forest);border-color:var(--forest);color:#fff}
+.fin-plain{margin-top:16px;font-size:13.5px;line-height:1.65;color:var(--ink);background:var(--mint);border-left:3px solid var(--emerald);padding:14px 16px;border-radius:0 var(--r-sm) var(--r-sm) 0}
+.fin-plain b{color:var(--emerald-d)}
+.fin-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.fin-dl{border:1.5px solid var(--line)}
+.fin-dl:hover{border-color:var(--emerald);color:var(--emerald-d)}
+@media (max-width:760px){ .fin-calc--wide{padding:22px 18px} .fin-grid2{grid-template-columns:1fr;gap:22px} .fin-actions .btn{flex:1 1 100%;justify-content:center} }
+
 /* intelligence */
 .intel-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:32px;align-items:start}
 .intel-dash{background:var(--forest-2);border:1px solid rgba(143,216,184,.16);border-radius:var(--r-lg);padding:24px}

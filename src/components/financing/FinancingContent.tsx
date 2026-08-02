@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowR, BankIc, BuildingIc, ChartIc, HomeIc, PeopleIc, TickIc, WalletIc, type IconType } from "@/components/ui/icons";
+import { ArrowR, BankIc, BuildingIc, ChartIc, DocIc, HomeIc, PeopleIc, TickIc, WalletIc, type IconType } from "@/components/ui/icons";
 import { Btn } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { fmtN } from "@/lib/format";
 import { useOverlay } from "@/context/OverlayProvider";
+import { downloadFinanceReport } from "@/lib/financeReport";
+import { emailFinancingPlan, submitLead } from "@/lib/leads";
 
 const PRESETS = [
   { name: "Starter · 2.5kVA", cost: 1450000 },
@@ -53,7 +55,8 @@ const FAQS = [
   ["Can I finance only part of the system?", "Yes. Choose any upfront amount from 20% upwards; the balance is what you finance. A larger upfront lowers your monthly repayment."],
 ];
 
-const RATE = 0.36; // indicative annual rate, reducing balance
+const MONTHLY_RATE = 0.03; // 3% per month, reducing balance
+const MONTHLY_PCT = 3; // shown to users
 
 type SchedRow = { m: number; opening: number; principal: number; interest: number; payment: number; closing: number };
 
@@ -92,16 +95,51 @@ function buildSchedule(principal: number, monthlyRate: number, months: number) {
 
 const FinancingContent = () => {
   const { openStart, openExpert } = useOverlay();
-  const [preset, setPreset] = useState(0);
+  const [priceInput, setPriceInput] = useState(String(PRESETS[0].cost));
+  const [dpMode, setDpMode] = useState<"pct" | "fixed">("pct");
   const [upfront, setUpfront] = useState(30);
+  const [downFixed, setDownFixed] = useState(String(Math.round(PRESETS[0].cost * 0.3)));
   const [tenor, setTenor] = useState(24);
   const [showSchedule, setShowSchedule] = useState(false);
-  const cost = PRESETS[preset].cost;
-  const upfrontAmt = Math.round((cost * upfront) / 100);
+  const [showDl, setShowDl] = useState(false);
+  const [dlName, setDlName] = useState("");
+  const [dlEmail, setDlEmail] = useState("");
+  const [downloading, setDownloading] = useState(false);
+  const [dlSent, setDlSent] = useState(false);
+
+  const cost = Math.max(0, parseInt(priceInput.replace(/[^0-9]/g, "")) || 0);
+  const upfrontAmt = dpMode === "pct"
+    ? Math.round((cost * upfront) / 100)
+    : Math.min(cost, Math.max(0, parseInt(downFixed.replace(/[^0-9]/g, "")) || 0));
+  const upfrontPct = cost > 0 ? (upfrontAmt / cost) * 100 : 0;
   const financed = Math.max(0, cost - upfrontAmt);
-  const sched = buildSchedule(financed, RATE / 12, tenor);
+  const sched = buildSchedule(financed, MONTHLY_RATE, tenor);
   const grandTotal = upfrontAmt + sched.totalPaid;
   const extraPct = cost > 0 ? ((grandTotal - cost) / cost) * 100 : 0;
+  const belowMin = dpMode === "fixed" && cost > 0 && upfrontPct < 20;
+
+  const dlValid = dlName.trim().length > 1 && /.+@.+\..+/.test(dlEmail.trim());
+  const openDl = () => { setDlSent(false); setShowDl(true); };
+  const confirmDownload = async () => {
+    if (downloading || cost <= 0 || !dlValid) return;
+    setDownloading(true);
+    try {
+      const dateLabel = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+      const plan = `${fmtN(cost)} system · ${upfrontPct.toFixed(0)}% upfront · ${tenor} months · from ${fmtN(sched.first)}/mo`;
+      const details = `Upfront ${fmtN(upfrontAmt)} · financed ${fmtN(financed)} · ${tenor} months at ${MONTHLY_PCT}%/mo reducing balance · monthly from ${fmtN(sched.first)} down to ${fmtN(sched.last)} · total repayments ${fmtN(sched.totalPaid)} · total cost ${fmtN(grandTotal)} (+${extraPct.toFixed(1)}% vs cash)`;
+      await downloadFinanceReport({
+        cost, upfrontAmt, upfrontPct, financed, tenor, monthlyRatePct: MONTHLY_PCT,
+        firstPayment: sched.first, lastPayment: sched.last, totalRepay: sched.totalPaid, grandTotal, extraPct,
+        rows: sched.rows.map((r) => ({ m: r.m, principal: r.principal, payment: r.payment, closing: r.closing })),
+        name: dlName.trim(), email: dlEmail.trim(), dateLabel,
+      });
+      emailFinancingPlan({ name: dlName.trim(), email: dlEmail.trim(), plan, details });
+      submitLead({ source: "Financing plan", name: dlName.trim(), email: dlEmail.trim(), details });
+      setDlSent(true);
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   return (
     <main className="page">
@@ -120,51 +158,99 @@ const FinancingContent = () => {
 
       {/* calculator */}
       <section className="section section--tight">
-        <div className="container split split--rev">
-          <div className="split-copy">
+        <div className="container">
+          <div className="section-head">
             <Eyebrow>Plan your payments</Eyebrow>
-            <h2>See your monthly number<br />before you commit.</h2>
-            <p className="lead">Move the sliders to model a plan. These figures are illustrative — your exact terms follow a free audit and a quick credit review.</p>
-            <ol className="fin-steps">
-              {["Pick a system size", "Set your upfront %", "Choose a repayment tenor", "See your monthly repayment"].map((s, i) => (
-                <li key={s}><span>{i + 1}</span>{s}</li>
-              ))}
-            </ol>
+            <h2>See your monthly number before you commit.</h2>
+            <p className="fin-intro-lead">Enter your system amount, set your upfront and tenor, and see the repayment instantly — with the full month-by-month schedule one tap away. Figures are illustrative; final terms follow a free audit and a quick credit review.</p>
           </div>
-          <div className="fin-calc">
+
+          <div className="fin-calc fin-calc--wide">
             <div className="fin-head">
               <span className="fin-title"><WalletIc size={18} color="#0A7A50" /> Financing calculator</span>
-              <span className="fin-chip">36% p.a. · reducing balance</span>
+              <span className="fin-chip">{MONTHLY_PCT}% / month · reducing balance</span>
             </div>
-            <div className="fin-presets">
-              {PRESETS.map((p, i) => (
-                <button key={p.name} className={i === preset ? "on" : ""} onClick={() => setPreset(i)}>{p.name}</button>
-              ))}
+
+            <div className="fin-grid2">
+              {/* inputs */}
+              <div className="fin-col">
+                <div className="fin-field">
+                  <label className="fin-lbl">System amount</label>
+                  <div className="fin-num-wrap">
+                    <span className="fin-num-cur">₦</span>
+                    <input className="fin-num" inputMode="numeric" value={Number(cost).toLocaleString("en-NG")}
+                      onChange={(e) => setPriceInput(e.target.value)} />
+                  </div>
+                  <div className="fin-price-chips">
+                    {PRESETS.map((p) => (
+                      <button key={p.name} className={p.cost === cost ? "on" : ""}
+                        onClick={() => { setPriceInput(String(p.cost)); if (dpMode === "fixed") setDownFixed(String(Math.round(p.cost * (upfrontPct || 30) / 100))); }}>
+                        {p.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="fin-field">
+                  <div className="fin-field-head">
+                    <label className="fin-lbl">Upfront payment</label>
+                    <div className="fin-mini">
+                      <button className={dpMode === "pct" ? "on" : ""} onClick={() => setDpMode("pct")}>%</button>
+                      <button className={dpMode === "fixed" ? "on" : ""} onClick={() => setDpMode("fixed")}>Fixed ₦</button>
+                    </div>
+                  </div>
+                  {dpMode === "pct" ? (
+                    <div className="fin-slider">
+                      <div className="fin-slider-top"><span>Slide to set</span><strong>{upfront}% · {fmtN(upfrontAmt)}</strong></div>
+                      <input type="range" min="20" max="70" step="5" value={upfront} onChange={(e) => setUpfront(+e.target.value)} />
+                      <div className="fin-minmax"><span>20% min</span><span>70%</span></div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="fin-num-wrap">
+                        <span className="fin-num-cur">₦</span>
+                        <input className="fin-num" inputMode="numeric" value={Number(upfrontAmt).toLocaleString("en-NG")}
+                          onChange={(e) => setDownFixed(e.target.value)} />
+                      </div>
+                      <p className={belowMin ? "fin-hint fin-hint--warn" : "fin-hint"}>
+                        That&apos;s {upfrontPct.toFixed(0)}% of the system amount.{belowMin ? " Below the 20% minimum upfront." : ""}
+                      </p>
+                    </>
+                  )}
+                </div>
+
+                <div className="fin-field">
+                  <label className="fin-lbl">Repayment period</label>
+                  <div className="fin-tenor-btns">
+                    {[12, 24, 36, 48].map((t) => (
+                      <button key={t} className={t === tenor ? "on" : ""} onClick={() => setTenor(t)}>{t} mo</button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* outputs */}
+              <div className="fin-col">
+                <div className="fin-result">
+                  <span>Estimated monthly repayment</span>
+                  <strong>{fmtN(sched.first)}<em>/month</em></strong>
+                  <p>{tenor > 1 ? `Reduces to ${fmtN(sched.last)} by month ${tenor} as you pay down. ` : ""}Illustrative — final terms follow your audit &amp; credit review.</p>
+                </div>
+                <div className="fin-breakdown">
+                  <div className="fin-row"><label>System amount</label><strong>{fmtN(cost)}</strong></div>
+                  <div className="fin-row"><label>Upfront today</label><strong>{fmtN(upfrontAmt)} · {upfrontPct.toFixed(0)}%</strong></div>
+                  <div className="fin-row"><label>Amount financed</label><strong>{fmtN(financed)}</strong></div>
+                  <div className="fin-row"><label>Total repayments</label><strong>{fmtN(sched.totalPaid)}</strong></div>
+                  <div className="fin-row"><label>Total cost of system (upfront + repayments)</label><strong>{fmtN(grandTotal)}</strong></div>
+                </div>
+                {cost > 0 && (
+                  <p className="fin-plain">
+                    <b>In plain terms:</b> instead of paying {fmtN(cost)} upfront, you pay {fmtN(upfrontAmt)} today, then spread the rest over {tenor} months{tenor > 1 ? ` — starting at ${fmtN(sched.first)} and easing down to ${fmtN(sched.last)} as you pay it off` : ""}. At the end, the system is fully yours.
+                  </p>
+                )}
+              </div>
             </div>
-            <div className="fin-row"><label>System cost</label><strong>{fmtN(cost)}</strong></div>
-            <div className="fin-slider">
-              <div className="fin-slider-top"><label>Upfront payment</label><strong>{upfront}% · {fmtN(upfrontAmt)}</strong></div>
-              <input type="range" min="20" max="70" step="5" value={upfront} onChange={(e) => setUpfront(+e.target.value)} />
-            </div>
-            <div className="fin-tenors">
-              <label>Repayment period</label>
-              <div>{[12, 24, 36, 48].map((t) => (
-                <button key={t} className={t === tenor ? "on" : ""} onClick={() => setTenor(t)}>{t} mo</button>
-              ))}</div>
-            </div>
-            <div className="fin-result">
-              <span>Estimated monthly repayment</span>
-              <strong>{fmtN(sched.first)}<em>/month</em></strong>
-              <p>{tenor > 1 ? `Starts here and steps down to ${fmtN(sched.last)} by month ${tenor} as the balance falls. ` : ""}Illustrative — final terms follow your audit &amp; credit review.</p>
-            </div>
-            <div className="fin-breakdown">
-              <div className="fin-row"><label>Upfront today</label><strong>{fmtN(upfrontAmt)}</strong></div>
-              <div className="fin-row"><label>Amount financed</label><strong>{fmtN(financed)}</strong></div>
-              <div className="fin-row"><label>Total interest ({tenor} mo)</label><strong>{fmtN(sched.totalInterest)}</strong></div>
-              <div className="fin-row"><label>Total repayments</label><strong>{fmtN(sched.totalPaid)}</strong></div>
-              <div className="fin-row"><label>Total cost (upfront + repayments)</label><strong>{fmtN(grandTotal)}</strong></div>
-              <div className="fin-row"><label>vs. paying cash</label><strong className="fin-extra">+{extraPct.toFixed(1)}%</strong></div>
-            </div>
+
             <label className="fin-sched-toggle">
               <input type="checkbox" checked={showSchedule} onChange={(e) => setShowSchedule(e.target.checked)} />
               Show full monthly schedule
@@ -174,14 +260,13 @@ const FinancingContent = () => {
                 <div className="fin-sched-scroll">
                   <table>
                     <thead>
-                      <tr><th>Month</th><th>Principal</th><th>Interest</th><th>Repayment</th><th>Balance left</th></tr>
+                      <tr><th>Month</th><th>Amount paid off</th><th>Repayment</th><th>Balance left</th></tr>
                     </thead>
                     <tbody>
                       {sched.rows.map((r) => (
                         <tr key={r.m}>
                           <td>{r.m}</td>
                           <td className="pri">{fmtN(r.principal)}</td>
-                          <td className="int">{fmtN(r.interest)}</td>
                           <td>{fmtN(r.payment)}</td>
                           <td>{fmtN(r.closing)}</td>
                         </tr>
@@ -189,10 +274,15 @@ const FinancingContent = () => {
                     </tbody>
                   </table>
                 </div>
-                <p className="fin-sched-cap">Interest each month is charged only on the balance still owed — so it falls as you pay the system down.</p>
+                <p className="fin-sched-cap">Your repayment is a little higher at the start and eases down each month as the balance you owe falls.</p>
               </div>
             )}
-            <Btn onClick={openStart}>Check my eligibility</Btn>
+
+            <div className="fin-actions">
+              <Btn onClick={openStart}>Check my eligibility</Btn>
+              <button type="button" className="btn btn--outline" onClick={() => openExpert()}><span>Talk to an expert</span></button>
+              <button type="button" className="btn btn--ghost fin-dl" onClick={openDl}><DocIc size={16} /><span>Download plan (PDF)</span></button>
+            </div>
           </div>
         </div>
       </section>
@@ -307,6 +397,36 @@ const FinancingContent = () => {
           </div>
         </div>
       </section>
+
+      {showDl && (
+        <div className="aud-dlg" role="dialog" aria-modal="true" aria-label="Download financing plan" onClick={() => !downloading && setShowDl(false)}>
+          <div className="aud-dlg-card" onClick={(e) => e.stopPropagation()}>
+            <button className="xp-close" onClick={() => !downloading && setShowDl(false)} aria-label="Close">✕</button>
+            {dlSent ? (
+              <>
+                <span className="aud-dlg-ic"><TickIc size={26} color="#0A7A50" /></span>
+                <h3>Plan on its way</h3>
+                <p>Your PDF is downloading, and we&apos;ve emailed a copy to {dlEmail.trim()}. A financing specialist will follow up to help you take the next step.</p>
+                <button type="button" className="btn btn--primary aud-dlg-go" onClick={() => setShowDl(false)}><span>Done</span></button>
+              </>
+            ) : (
+              <>
+                <span className="aud-dlg-ic"><DocIc size={24} color="#0A7A50" /></span>
+                <h3>Download your financing plan</h3>
+                <p>We&apos;ll build a branded PDF with your numbers and the full schedule, download it, and email you a copy.</p>
+                <label className="f-field"><span>Full name</span>
+                  <input value={dlName} onChange={(e) => setDlName(e.target.value)} placeholder="Adaeze Okonkwo" /></label>
+                <label className="f-field"><span>Email</span>
+                  <input type="email" value={dlEmail} onChange={(e) => setDlEmail(e.target.value)} placeholder="you@email.com" /></label>
+                <button type="button" className={"btn btn--primary aud-dlg-go" + (dlValid ? "" : " btn--disabled")} onClick={confirmDownload} disabled={!dlValid || downloading}>
+                  <span>{downloading ? "Preparing…" : "Download plan"}</span><DocIc size={16} />
+                </button>
+                <p className="aud-dlg-note">We&apos;ll email your plan and use this to follow up. No spam.</p>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </main>
   );
 };

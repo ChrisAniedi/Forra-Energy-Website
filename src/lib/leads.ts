@@ -44,6 +44,35 @@ export async function submitLead(lead: Lead): Promise<void> {
   }
 }
 
+/** Emails the client a copy of their financing plan + next steps (CCs the client + the team). */
+export async function emailFinancingPlan(o: {
+  name: string;
+  email: string;
+  plan: string; // one-line plan summary
+  details: string; // fuller breakdown
+}): Promise<void> {
+  if (!LEADS_ENDPOINT) return;
+  try {
+    await fetch(LEADS_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({
+        _subject: `Your Forra Energy financing plan, ${o.name}`,
+        _template: "box",
+        _captcha: "false",
+        _cc: `${LEADS_CC},${o.email}`,
+        Hi_there: `Hi ${o.name}, thanks for planning your solar financing with Forra. Here's the plan you built — your full PDF, with the month-by-month schedule, is on your device.`,
+        Your_plan: o.plan,
+        The_details: o.details,
+        What_happens_next: "One of our financing specialists will reach out to walk you through the numbers, answer any questions, and — after a free audit — confirm your final terms in writing. No obligation at all.",
+        Warm_regards: "The Forra Energy team · hello@forra.energy · +234 903 526 6832 · www.forra.energy",
+      }),
+    });
+  } catch {
+    /* fire-and-forget */
+  }
+}
+
 /** Emails the client a copy of their audit report + next steps (CCs the client + the team). */
 export async function emailClientReport(o: {
   name: string;
