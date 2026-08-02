@@ -16,8 +16,10 @@ export interface FinancePlanInput {
   upfrontAmt: number;
   upfrontPct: number;
   financed: number;
-  tenor: number;
-  monthlyRatePct: number; // e.g. 3
+  count: number; // number of repayments
+  periodUnit: string; // e.g. "month"
+  periodTitle: string; // e.g. "Month"
+  rateLabel: string; // e.g. "3% / month"
   firstPayment: number;
   lastPayment: number;
   totalRepay: number;
@@ -90,23 +92,24 @@ export function buildFinanceReport(doc: jsPDF, inp: FinancePlanInput, logo: { da
   // ---- headline ----
   heading("Your plan");
   doc.setFont("helvetica", "bold").setFontSize(16).setTextColor(...FOREST);
-  const monthlyLine = inp.tenor > 1
-    ? `${money(inp.firstPayment)} / month`
+  const monthlyLine = inp.count > 1
+    ? `${money(inp.firstPayment)} / ${inp.periodUnit}`
     : `${money(inp.firstPayment)}`;
   doc.text(ascii(monthlyLine), L, y);
   y += 16;
   doc.setFont("helvetica", "normal").setFontSize(10).setTextColor(...SUB);
-  const sub = inp.tenor > 1
-    ? `First monthly payment, reducing to ${money(inp.lastPayment)} by month ${inp.tenor}`
+  const sub = inp.count > 1
+    ? `First ${inp.periodUnit} payment, reducing to ${money(inp.lastPayment)} by ${inp.periodUnit} ${inp.count}`
     : "One repayment";
   doc.text(ascii(sub), L, y);
   y += 20;
 
+  const periodPlural = `${inp.periodUnit}${inp.count === 1 ? "" : "s"}`;
   row("System amount", money(inp.cost));
   row("Upfront today", `${money(inp.upfrontAmt)}  (${inp.upfrontPct.toFixed(0)}%)`);
   row("Amount financed", money(inp.financed));
-  row("Repayment period", `${inp.tenor} months`);
-  row("Rate", `${inp.monthlyRatePct}% / month, reducing balance`);
+  row("Repayment plan", `${inp.count} ${periodPlural}`);
+  row("Rate", `${inp.rateLabel}, reducing balance`);
   row("Total repayments", money(inp.totalRepay));
   row("Total cost of system (upfront + repayments)", money(inp.grandTotal));
   y += 12;
@@ -116,7 +119,7 @@ export function buildFinanceReport(doc: jsPDF, inp: FinancePlanInput, logo: { da
   heading("Repayment schedule");
   const cols = { m: L, principal: 250, payment: 400, balance: R };
   doc.setFont("helvetica", "bold").setFontSize(8.5).setTextColor(...SUB);
-  doc.text("MONTH", cols.m, y);
+  doc.text(inp.periodTitle.toUpperCase(), cols.m, y);
   doc.text("PRINCIPAL", cols.principal, y, { align: "right" });
   doc.text("REPAYMENT", cols.payment, y, { align: "right" });
   doc.text("BALANCE LEFT", cols.balance, y, { align: "right" });

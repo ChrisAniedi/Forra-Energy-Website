@@ -189,6 +189,8 @@
 .fin-num-cur{position:absolute;left:14px;color:var(--sub);font-family:var(--disp);font-weight:600;font-size:16px;pointer-events:none}
 .fin-num{width:100%;background:var(--mist);border:1.5px solid var(--line);border-radius:var(--r-sm);padding:12px 14px 12px 30px;font-family:var(--disp);font-weight:600;font-size:18px;color:var(--ink)}
 .fin-num:focus{outline:none;border-color:var(--emerald)}
+.fin-select{width:100%;background:var(--mist);border:1.5px solid var(--line);border-radius:var(--r-sm);padding:12px 36px 12px 14px;font-family:var(--disp);font-weight:600;font-size:15px;color:var(--ink);cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235C6B62'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+.fin-select:focus{outline:none;border-color:var(--emerald)}
 .fin-price-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .fin-price-chips button{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:6px 11px;font-size:11.5px;font-weight:600;color:var(--sub);transition:all .15s}
 .fin-price-chips button.on{border-color:var(--emerald);background:var(--mint);color:var(--emerald-d)}
