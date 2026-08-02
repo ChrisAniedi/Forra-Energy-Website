@@ -60,15 +60,16 @@ const ANNUAL_RATE = 0.36; // 36% a year, charged on the reducing balance
 /** Repayment frequencies. Only monthly is live today; the rest are wired up (rate + ranges)
  *  so switching them on later is a one-line change (enabled: true). */
 const FREQ = {
-  monthly:    { key: "monthly",    label: "Monthly",     unit: "month",     periodsPerYear: 12,  min: 6,  max: 48,  def: 24,  enabled: true },
-  weekly:     { key: "weekly",     label: "Weekly",      unit: "week",      periodsPerYear: 52,  min: 12, max: 104, def: 52,  enabled: false },
-  daily:      { key: "daily",      label: "Daily",       unit: "day",       periodsPerYear: 365, min: 30, max: 365, def: 180, enabled: false },
-  quarterly:  { key: "quarterly",  label: "Quarterly",   unit: "quarter",   periodsPerYear: 4,   min: 2,  max: 20,  def: 8,   enabled: false },
-  biannually: { key: "biannually", label: "Bi-annually", unit: "half-year", periodsPerYear: 2,   min: 2,  max: 10,  def: 4,   enabled: false },
-  annually:   { key: "annually",   label: "Annually",    unit: "year",      periodsPerYear: 1,   min: 1,  max: 6,   def: 3,   enabled: false },
+  monthly:    { key: "monthly",    label: "Monthly",     unit: "month",     periodsPerYear: 12,  min: 2, max: 48,  def: 24,  enabled: true },
+  weekly:     { key: "weekly",     label: "Weekly",      unit: "week",      periodsPerYear: 52,  min: 2, max: 104, def: 52,  enabled: false },
+  daily:      { key: "daily",      label: "Daily",       unit: "day",       periodsPerYear: 365, min: 2, max: 365, def: 180, enabled: false },
+  quarterly:  { key: "quarterly",  label: "Quarterly",   unit: "quarter",   periodsPerYear: 4,   min: 2, max: 20,  def: 8,   enabled: false },
+  biannually: { key: "biannually", label: "Bi-annually", unit: "half-year", periodsPerYear: 2,   min: 2, max: 10,  def: 4,   enabled: false },
+  annually:   { key: "annually",   label: "Annually",    unit: "year",      periodsPerYear: 1,   min: 2, max: 6,   def: 3,   enabled: false },
 } as const;
 type FreqKey = keyof typeof FREQ;
 const plural = (u: string, n: number) => `${u}${n === 1 ? "" : "s"}`;
+const QUICK = [12, 24, 36, 48]; // quick-pick payment counts
 
 type SchedRow = { m: number; opening: number; principal: number; interest: number; payment: number; closing: number };
 
@@ -130,7 +131,8 @@ const FinancingContent = () => {
   const periodRate = ANNUAL_RATE / freq.periodsPerYear;
   const rateLabel = `${+(periodRate * 100).toFixed(2)}% / ${freq.unit}`;
   const periodTitle = freq.unit.charAt(0).toUpperCase() + freq.unit.slice(1);
-  const sched = buildSchedule(financed, periodRate, count);
+  const installments = Math.max(1, count - 1); // payment 1 is the down payment; the rest clear the balance
+  const sched = buildSchedule(financed, periodRate, installments);
   const grandTotal = upfrontAmt + sched.totalPaid;
   const extraPct = cost > 0 ? ((grandTotal - cost) / cost) * 100 : 0;
   const belowMin = dpMode === "fixed" && cost > 0 && upfrontPct < 20;
@@ -253,11 +255,16 @@ const FinancingContent = () => {
                 </div>
 
                 <div className="fin-field">
-                  <label className="fin-lbl">Number of repayments</label>
+                  <label className="fin-lbl">Number of payments</label>
                   <div className="fin-slider">
-                    <div className="fin-slider-top"><span>Slide to set</span><strong>{count} {plural(freq.unit, count)}</strong></div>
+                    <div className="fin-slider-top"><span>1st payment is your upfront</span><strong>{count} {plural(freq.unit, count)}</strong></div>
                     <input type="range" min={freq.min} max={freq.max} step={1} value={count} onChange={(e) => setCount(+e.target.value)} />
-                    <div className="fin-minmax"><span>{freq.min}</span><span>{freq.max}</span></div>
+                    <div className="fin-minmax"><span>{freq.min} min</span><span>{freq.max}</span></div>
+                  </div>
+                  <div className="fin-price-chips">
+                    {QUICK.filter((n) => n >= freq.min && n <= freq.max).map((n) => (
+                      <button key={n} className={n === count ? "on" : ""} onClick={() => setCount(n)}>{n} {freq.unit === "month" ? "mo" : plural(freq.unit, n)}</button>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -267,7 +274,7 @@ const FinancingContent = () => {
                 <div className="fin-result">
                   <span>Estimated {freq.label.toLowerCase()} repayment</span>
                   <strong>{fmtN(sched.first)}<em>/{freq.unit}</em></strong>
-                  <p>{count > 1 ? `Reduces to ${fmtN(sched.last)} by ${freq.unit} ${count} as you pay down. ` : ""}Illustrative — final terms follow your audit &amp; credit review.</p>
+                  <p>{installments > 1 ? `Reduces to ${fmtN(sched.last)} by ${freq.unit} ${count} as you pay down. ` : ""}Illustrative — final terms follow your audit &amp; credit review.</p>
                 </div>
                 <div className="fin-breakdown">
                   <div className="fin-row"><label>System amount</label><strong>{fmtN(cost)}</strong></div>
@@ -278,7 +285,7 @@ const FinancingContent = () => {
                 </div>
                 {cost > 0 && (
                   <p className="fin-plain">
-                    <b>In plain terms:</b> instead of paying {fmtN(cost)} upfront, you pay {fmtN(upfrontAmt)} today, then spread the rest over {count} {plural(freq.unit, count)}{count > 1 ? ` — starting at ${fmtN(sched.first)} and easing down to ${fmtN(sched.last)} as you pay it off` : ""}. At the end, the system is fully yours.
+                    <b>In plain terms:</b> instead of paying {fmtN(cost)} upfront, you pay {fmtN(upfrontAmt)} today as your 1st payment, then clear the balance over the next {installments} {plural(freq.unit, installments)}{installments > 1 ? ` — starting at ${fmtN(sched.first)} and easing down to ${fmtN(sched.last)} as you pay it off` : ` with a final payment of ${fmtN(sched.first)}`}. At the end, the system is fully yours.
                   </p>
                 )}
               </div>
@@ -296,9 +303,15 @@ const FinancingContent = () => {
                       <tr><th>{periodTitle}</th><th>Amount paid off</th><th>Repayment</th><th>Balance left</th></tr>
                     </thead>
                     <tbody>
+                      <tr>
+                        <td>1 · Upfront</td>
+                        <td className="pri">{fmtN(upfrontAmt)}</td>
+                        <td>{fmtN(upfrontAmt)}</td>
+                        <td>{fmtN(financed)}</td>
+                      </tr>
                       {sched.rows.map((r) => (
                         <tr key={r.m}>
-                          <td>{r.m}</td>
+                          <td>{r.m + 1}</td>
                           <td className="pri">{fmtN(r.principal)}</td>
                           <td>{fmtN(r.payment)}</td>
                           <td>{fmtN(r.closing)}</td>

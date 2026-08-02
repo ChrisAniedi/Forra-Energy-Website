@@ -127,15 +127,17 @@ export function buildFinanceReport(doc: jsPDF, inp: FinancePlanInput, logo: { da
   doc.setDrawColor(...LINE).setLineWidth(0.7).line(L, y, R, y);
   y += 14;
   doc.setFont("helvetica", "normal").setFontSize(9.5).setTextColor(...INK);
-  inp.rows.forEach((r) => {
+  const drawRow = (label: string, principal: number, payment: number, balance: number) => {
     pageBreak(20);
-    doc.text(String(r.m), cols.m, y);
-    doc.text(ascii(money(r.principal)), cols.principal, y, { align: "right" });
-    doc.text(ascii(money(r.payment)), cols.payment, y, { align: "right" });
-    doc.text(ascii(money(r.closing)), cols.balance, y, { align: "right" });
+    doc.text(label, cols.m, y);
+    doc.text(ascii(money(principal)), cols.principal, y, { align: "right" });
+    doc.text(ascii(money(payment)), cols.payment, y, { align: "right" });
+    doc.text(ascii(money(balance)), cols.balance, y, { align: "right" });
     y += 13;
     doc.setDrawColor(...LINE).setLineWidth(0.4).line(L, y - 4, R, y - 4);
-  });
+  };
+  drawRow("1 - Upfront", inp.upfrontAmt, inp.upfrontAmt, inp.financed);
+  inp.rows.forEach((r) => drawRow(String(r.m + 1), r.principal, r.payment, r.closing));
   y += 16;
 
   // ---- disclaimer ----
